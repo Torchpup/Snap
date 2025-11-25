@@ -739,7 +739,7 @@ public struct Vect2 : IEquatable<Vect2>
 	/// </summary>
 	/// <param name="vector">The vector.</param>
 	/// <param name="amount">The scalar.</param>
-	/// <returns>The resulting vector.</returns
+	/// <returns>The resulting vector.</returns>
 	public static Vect2 Divide(in Vect2 vector, float amount) => new(vector.X / amount, vector.Y / amount);
 	#endregion
 

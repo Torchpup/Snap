@@ -42,6 +42,21 @@ public sealed class ContentTypeWriter : BinaryWriter
 	}
 
 	/// <summary>
+	/// Writes an enum value to the underlying stream as a 32 bit integer.
+	/// </summary>
+	/// <param name="value">
+	/// The enum value to write. The enum's underlying value is converted to
+	/// an Int32 before being written.
+	/// </param>
+	/// <remarks>
+	/// This method does not preserve the enum's original underlying type.
+	/// All enums are serialized as Int32 values for consistency.
+	/// </remarks>
+	public void WriteEnum(Enum value) =>
+		Write(Convert.ToInt32(value));
+	
+
+	/// <summary>
 	/// Writes an object of type <typeparamref name="T"/> to the current stream using XML serialization.
 	/// </summary>
 	/// <typeparam name="T">The type of the object to serialize.</typeparam>
