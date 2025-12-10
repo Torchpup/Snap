@@ -8,7 +8,7 @@ namespace Snap.Engine.Coroutines.Routines.Utilities;
 public sealed class WaitForBeacon : IEnumerator
 {
 	private readonly string _topic;
-	private readonly Func<BeaconHandle, bool>? _predicate;
+	private readonly Func<BeaconHandle, bool> _predicate;
 	private readonly float _timeoutSeconds;
 	private bool _subscribed;
 	private bool _done;
@@ -37,7 +37,7 @@ public sealed class WaitForBeacon : IEnumerator
 	/// <param name="timeoutSeconds">
 	/// Optional timeout in seconds. Use a negative value to wait forever.
 	/// </param>
-	public WaitForBeacon(string topic, Func<BeaconHandle, bool>? predicate = null, float timeoutSeconds = -1f)
+	public WaitForBeacon(string topic, Func<BeaconHandle, bool> predicate = null, float timeoutSeconds = -1f)
 	{
 		if (string.IsNullOrEmpty(topic))
 			throw new ArgumentException("Topic must be non-empty.", nameof(topic));
@@ -54,7 +54,7 @@ public sealed class WaitForBeacon : IEnumerator
 	/// <param name="topic">Enum topic to subscribe to.</param>
 	/// <param name="predicate">Optional filter. See <see cref="WaitForBeacon(string, Func{BeaconHandle, bool}, float)"/>.</param>
 	/// <param name="timeoutSeconds">Optional timeout in seconds. Negative to wait forever.</param>
-	public WaitForBeacon(Enum topic, Func<BeaconHandle, bool>? predicate = null, float timeoutSeconds = -1f)
+	public WaitForBeacon(Enum topic, Func<BeaconHandle, bool> predicate = null, float timeoutSeconds = -1f)
 		: this(topic.ToEnumString(), predicate, timeoutSeconds) { }
 
 	/// <summary>

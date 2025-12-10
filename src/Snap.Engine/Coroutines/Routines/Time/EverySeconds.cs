@@ -11,7 +11,7 @@ namespace Snap.Engine.Coroutines.Routines.Time;
 /// </para>
 /// <para>
 /// Timing is based on <see cref="Clock.DeltaTime"/> and will trigger 
-/// the provided action approximately every <paramref name="interval"/> seconds.
+/// the provided action approximately every seconds.
 /// </para>
 /// </remarks>
 public class EverySeconds : IEnumerator

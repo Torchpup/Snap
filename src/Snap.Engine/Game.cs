@@ -35,7 +35,14 @@ public class Game : IDisposable
 	public string ApplicationLogFolder => Path.Combine(ApplicationFolder, Settings.LogDirectory);
 	public string ApplicationSaveFolder => Path.Combine(ApplicationFolder, Settings.SaveDirectory);
 
-
+	/// <summary>
+	/// Applies a change to the fullscreen mode setting.  
+	/// If the value is identical to the current setting, no changes are marked for application.
+	/// </summary>
+	/// <param name="value">True to enable fullscreen mode; false to use windowed mode.</param>
+	/// <remarks>
+	/// Sets <see cref="_canApplyChanges"/> to true only if the fullscreen state differs from the existing setting.
+	/// </remarks>
 	public void ApplyFullScreenChange(bool value)
 	{
 		if (Settings.FullScreen == value)
@@ -48,6 +55,15 @@ public class Game : IDisposable
 		_canApplyChanges = true;
 	}
 
+	/// <summary>
+	/// Applies a change to the window size configuration.  
+	/// If the provided size matches the current configuration, or is invalid, no change is applied.
+	/// </summary>
+	/// <param name="width">The desired window width in pixels. Must be greater than zero.</param>
+	/// <param name="height">The desired window height in pixels. Must be greater than zero.</param>
+	/// <remarks>
+	/// Updates <see cref="Settings.Window"/> and flags <see cref="_canApplyChanges"/> if a valid size change is detected.
+	/// </remarks>
 	public void ApplyWindowSizeChange(uint width, uint height)
 	{
 		if (width <= 0)
@@ -70,6 +86,14 @@ public class Game : IDisposable
 		_canApplyChanges = true;
 	}
 
+	/// <summary>
+	/// Applies a change to the vertical synchronization (VSync) setting.  
+	/// If the new value is the same as the current one, no action is taken.
+	/// </summary>
+	/// <param name="value">True to enable VSync; false to disable it.</param>
+	/// <remarks>
+	/// Sets <see cref="_canApplyChanges"/> to true only when the setting differs from the current configuration.
+	/// </remarks>
 	public void ApplyVSyncChange(bool value)
 	{
 		if (Settings.VSync == value)
@@ -82,6 +106,14 @@ public class Game : IDisposable
 		_canApplyChanges = true;
 	}
 
+	/// <summary>
+	/// Applies a change to the antialiasing level.  
+	/// If the provided value matches the existing configuration, no change is queued.
+	/// </summary>
+	/// <param name="value">The desired antialiasing level (samples per pixel). Must be a non-negative integer.</param>
+	/// <remarks>
+	/// Converts the value to an integer and marks <see cref="_canApplyChanges"/> only if the level differs.
+	/// </remarks>
 	public void ApplyAntialiasingChange(uint value)
 	{
 		if (Settings.Antialiasing == value)
@@ -94,6 +126,23 @@ public class Game : IDisposable
 		_canApplyChanges = true;
 	}
 
+	/// <summary>
+	/// Commits any pending video, window, or rendering context changes.  
+	/// Recreates the underlying render window if necessary.
+	/// </summary>
+	/// <exception cref="WindowCreationException">
+	/// Thrown when the render window fails to initialize or the system does not support the required OpenGL version.
+	/// </exception>
+	/// <remarks>
+	/// This method will:
+	/// <list type="bullet">
+	/// <item>Dispose of the existing window if it is invalid.</item>
+	/// <item>Recreate the SFML render window with updated settings and context.</item>
+	/// <item>Reattach input handlers and event listeners.</item>
+	/// <item>Center the window if not in fullscreen mode.</item>
+	/// </list>
+	/// After successful execution, <see cref="_canApplyChanges"/> is reset to false.
+	/// </remarks>
 	public void ApplyChanges()
 	{
 		if (!_canApplyChanges)
@@ -194,6 +243,38 @@ public class Game : IDisposable
 	private readonly CoroutineManager _coroutineManager;
 	private readonly TextureAtlasManager _textureAtlasManager;
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Game"/> class using the specified engine settings.  
+	/// This constructor performs full system initialization, including window creation, logging,
+	/// context setup, and all core service managers required for the SNAP engine.
+	/// </summary>
+	/// <param name="settings">
+	/// The <see cref="EngineSettings"/> object containing all configuration values required
+	/// to bootstrap the engine (window parameters, graphics options, logging, input, etc.).
+	/// </param>
+	/// <exception cref="ArgumentNullException">
+	/// Thrown if <paramref name="settings"/> is null.
+	/// </exception>
+	/// <exception cref="InvalidOperationException">
+	/// Thrown if <paramref name="settings"/> has not been initialized via <c>EngineSettingsBuilder.Build()</c>.
+	/// </exception>
+	/// <exception cref="WindowCreationException">
+	/// Thrown when the render window fails to be created or an unsupported OpenGL version is detected.
+	/// </exception>
+	/// <remarks>
+	/// This constructor:
+	/// <list type="bullet">
+	/// <item>Validates and stores engine settings.</item>
+	/// <item>Creates required application folders for logs and saves.</item>
+	/// <item>Initializes logging and outputs startup diagnostics.</item>
+	/// <item>Creates and centers the SFML render window using the provided context and style flags.</item>
+	/// <item>Registers window events and global exception handlers.</item>
+	/// <item>Initializes all SNAP core subsystems — including input, clock, asset, sound, renderer,
+	/// coroutine, and texture atlas managers.</item>
+	/// </list>
+	/// By the end of construction, the engine runtime environment is fully operational and ready to enter
+	/// the main loop or game execution phase.
+	/// </remarks>
 	public Game(EngineSettings settings)
 	{
 		ArgumentNullException.ThrowIfNull(settings);
@@ -341,9 +422,26 @@ public class Game : IDisposable
 		_log.Log(LogLevel.Info, $"Initializing Texture Atlas manager. Page size: {Settings.AtlasPageSize} with max {Settings.MaxAtlasPages} pages");
 		_textureAtlasManager = new TextureAtlasManager(Settings.AtlasPageSize, Settings.MaxAtlasPages);
 	}
+
+	/// <summary>
+	/// Finalizer for the <see cref="Game"/> class.  
+	/// Ensures that unmanaged resources are released if <see cref="Dispose(bool)"/> was not called explicitly.
+	/// </summary>
+	/// <remarks>
+	/// Invokes <see cref="Dispose(bool)"/> with <c>false</c> to perform cleanup during garbage collection.  
+	/// This should only run if the game instance was not disposed manually.
+	/// </remarks>
 	~Game() => Dispose(disposing: false);
 
-
+	/// <summary>
+	/// Closes the active game window and initiates application shutdown.  
+	/// </summary>
+	/// <remarks>
+	/// Safely terminates the current <see cref="_window"/> instance if it is open.  
+	/// If the window is already closed or invalid, the call is ignored.  
+	/// This method does not immediately dispose engine systems; it simply signals the
+	/// end of the active rendering session.
+	/// </remarks>
 	public void Quit()
 	{
 		if (_window?.IsOpen != true)
@@ -366,6 +464,24 @@ public class Game : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Starts the main game loop for the SNAP engine.  
+	/// Initializes core systems if not already initialized, loads services and screens,
+	/// and begins processing events, updates, and rendering until the window is closed.
+	/// </summary>
+	/// <exception cref="InvalidOperationException">
+	/// Thrown if the render window is invalid and cannot be used to start the engine.
+	/// </exception>
+	/// <remarks>
+	/// This method:
+	/// <list type="bullet">
+	/// <item>Validates the window before starting the loop.</item>
+	/// <item>Loads the input map and initializes asset, screen, and service systems if needed.</item>
+	/// <item>Executes the main loop, dispatching window events and updating the clock and coroutine managers each frame.</item>
+	/// <item>Clears, updates, and redraws all active screens until the window is closed.</item>
+	/// </list>
+	/// The loop continues until the user or system triggers a window close event.
+	/// </remarks>
 	public void Run()
 	{
 		if (_window.IsInvalid)
@@ -410,6 +526,19 @@ public class Game : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Releases the unmanaged resources used by the <see cref="Game"/> instance  
+	/// and optionally disposes of managed resources.
+	/// </summary>
+	/// <param name="disposing">
+	/// True to release both managed and unmanaged resources;  
+	/// false to release only unmanaged resources during finalization.
+	/// </param>
+	/// <remarks>
+	/// This method is invoked by <see cref="Dispose()"/> when disposal is explicit,  
+	/// or by the finalizer (~<see cref="Game"/>) when called by the garbage collector.  
+	/// It clears all core managers and disposes of the active render window to free GPU and memory resources.
+	/// </remarks>
 	protected virtual void Dispose(bool disposing)
 	{
 		if (!_isDisposed)
@@ -423,6 +552,14 @@ public class Game : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Performs application-defined tasks associated with freeing, releasing,  
+	/// or resetting unmanaged resources used by the <see cref="Game"/> instance.
+	/// </summary>
+	/// <remarks>
+	/// Calls <see cref="Dispose(bool)"/> with <c>true</c> and suppresses finalization  
+	/// to prevent redundant cleanup by the garbage collector.
+	/// </remarks>
 	public void Dispose()
 	{
 		Dispose(disposing: true);

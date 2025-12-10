@@ -42,7 +42,7 @@ public static class IEnumerableExtensions
 	/// <returns>
 	/// The element at position <paramref name="index"/> if within bounds; otherwise, <c>default</c> of <typeparamref name="T"/>.
 	/// </returns>
-	public static T? SafeElementAt<T>(this IEnumerable<T> source, int index) =>
+	public static T SafeElementAt<T>(this IEnumerable<T> source, int index) =>
 		index >= 0 && index < source.Count() ? source.ElementAt(index) : default;
 
 	/// <summary>

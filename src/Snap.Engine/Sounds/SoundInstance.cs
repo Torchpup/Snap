@@ -108,6 +108,9 @@ public class SoundInstance : IDisposable
 		if (IsPlaying)
 			return;
 
+		if (_sound.IsInvalid)
+			_sound = new(_sound.SoundBuffer);
+
 		_sound.Volume = Math.Clamp(_volume * 100f, 0f, 100f);
 		_sound.Position = new(_pan, 0, 0);
 		_sound.Pitch = _pitch;

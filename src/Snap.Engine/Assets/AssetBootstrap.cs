@@ -13,7 +13,7 @@ public static class AssetBootstrap
 	/// </summary>
 	/// <param name="contentRoot">
 	/// The root directory for content, relative to the application base.
-	/// If <c>null</c>, uses <see cref="EngineSettings.Instance.AppContentRoot"/>.
+	/// If <c>null</c>, uses <see cref="EngineSettings.AppContentRoot"/>.
 	/// </param>
 	/// <param name="warnIfEmpty">
 	/// If <c>true</c>, logs a warning if no files are found in the content root.
@@ -23,7 +23,7 @@ public static class AssetBootstrap
 	/// and registers it with the <see cref="AssetManager"/>. If the content root is empty,
 	/// a warning is logged to guide first-time users.
 	/// </remarks>
-	public static void InitDefault(string? contentRoot = null, bool warnIfEmpty = true)
+	public static void InitDefault(string contentRoot = null, bool warnIfEmpty = true)
 	{
 		contentRoot ??= EngineSettings.Instance.AppContentRoot;
 

@@ -77,7 +77,7 @@ public sealed class Sound : IAsset, IEquatable<Sound>
 	public SoundInstance CreateInstance()
 	{
 		if (!IsValid)
-			return null;
+			Load();
 
 		// Try to reuse a stopped (inactive) instance
 		var reusable = _instances.FirstOrDefault(x => x.Status == SoundStatus.Stopped);

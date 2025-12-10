@@ -3,7 +3,7 @@ namespace Snap.Engine.Services;
 /// <summary>
 /// Base class for all game services.
 /// </summary>
-public class GameService
+public class Service
 {
 	/// <summary>
 	/// Initializes the service. Override this method to provide custom initialization logic.
@@ -16,7 +16,7 @@ public class GameService
 /// </summary>
 public sealed class ServiceManager
 {
-	private readonly Dictionary<Type, GameService> _services = new(10);
+	private readonly Dictionary<Type, Service> _services = new(10);
 
 	/// <summary>
 	/// Gets the singleton instance of the <see cref="ServiceManager"/>.
@@ -37,9 +37,9 @@ public sealed class ServiceManager
 	/// <exception cref="ArgumentNullException">Thrown if <paramref name="service"/> is <see langword="null"/>.</exception>
 	/// <exception cref="ArgumentException">Thrown if a service of the same type is already registered.</exception>
 	/// <remarks>
-	/// This method also initializes the service via <see cref="GameService.Iniitialize"/> and notifies the <see cref="BeaconManager"/>.
+	/// This method also initializes the service via <see cref="Service.Iniitialize"/> and notifies the <see cref="BeaconManager"/>.
 	/// </remarks>
-	public void RegisterService(GameService service)
+	public void RegisterService(Service service)
 	{
 		if (service == null)
 			throw new ArgumentNullException(nameof(service));
@@ -57,11 +57,10 @@ public sealed class ServiceManager
 	/// </summary>
 	/// <typeparam name="T">The type of the service to retrieve.</typeparam>
 	/// <returns>The requested service.</returns>
-	/// <exception cref="Exception">Thrown if the service is not found.</exception>
-	public T GetService<T>() where T : GameService
+	public T GetService<T>() where T : Service
 	{
 		if (!_services.TryGetValue(typeof(T), out var service))
-			throw new Exception();
+			return default;
 
 		return (T)service;
 	}
@@ -72,7 +71,7 @@ public sealed class ServiceManager
 	/// <typeparam name="T">The type of the service to retrieve.</typeparam>
 	/// <param name="service">When this method returns, contains the service of type <typeparamref name="T"/>, or <see langword="null"/> if not found.</param>
 	/// <returns><see langword="true"/> if the service was found; otherwise, <see langword="false"/>.</returns>
-	public bool TryGetService<T>(out T service) where T : GameService
+	public bool TryGetService<T>(out T service) where T : Service
 	{
 		service = GetService<T>();
 

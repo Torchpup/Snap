@@ -19,7 +19,7 @@ public sealed class WaitForBeaconCount : IEnumerator
 {
 	private readonly string _topic;
 	private readonly int _targetCount;
-	private readonly Func<BeaconHandle, bool>? _predicate;
+	private readonly Func<BeaconHandle, bool> _predicate;
 	private readonly float _timeoutSeconds;
 
 	private int _count;
@@ -45,7 +45,7 @@ public sealed class WaitForBeaconCount : IEnumerator
 	/// </param>
 	/// <exception cref="ArgumentException">Thrown if <paramref name="topic"/> is null or empty.</exception>
 	/// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="count"/> is less than or equal to zero.</exception>
-	public WaitForBeaconCount(string topic, int count, Func<BeaconHandle, bool>? predicate = null, float timeoutSeconds = -1f)
+	public WaitForBeaconCount(string topic, int count, Func<BeaconHandle, bool> predicate = null, float timeoutSeconds = -1f)
 	{
 		if (string.IsNullOrEmpty(topic))
 			throw new ArgumentException("Topic must be non-empty.", nameof(topic));
@@ -69,7 +69,7 @@ public sealed class WaitForBeaconCount : IEnumerator
 	/// <param name="timeoutSeconds">
 	/// Optional timeout in seconds. Set to a negative value to wait indefinitely.
 	/// </param>
-	public WaitForBeaconCount(Enum topic, int count, Func<BeaconHandle, bool>? predicate = null, float timeoutSeconds = -1f)
+	public WaitForBeaconCount(Enum topic, int count, Func<BeaconHandle, bool> predicate = null, float timeoutSeconds = -1f)
 		: this(topic.ToEnumString(), count, predicate, timeoutSeconds) { }
 
 	/// <summary>

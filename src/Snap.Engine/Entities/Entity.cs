@@ -218,6 +218,15 @@ public class Entity
 	/// </summary>
 	private Vect2 _size = Vect2.One; // <-- Leave as one not zero, will cause the engine to skip these entities
 
+	/// <summary>
+	/// Gets the center point of the entity.
+	/// </summary>
+	/// <remarks>
+	/// The center is calculated as half of the entity’s <c>Size</c>, returning
+	/// a <see cref="Vect2"/> that represents the midpoint. This is commonly used
+	/// for positioning, alignment, and transformations relative to the entity’s
+	/// bounds.
+	/// </remarks>
 	public Vect2 Center => Size / 2f;
 
 	/// <summary>

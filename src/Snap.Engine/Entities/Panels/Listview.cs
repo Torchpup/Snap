@@ -52,7 +52,7 @@ public class ListviewItem : Entity
 	/// <summary>
 	/// Gets or sets the highlight color used for selection indication.
 	/// </summary>
-	public Color Color { get; set; } = Color.Blue;
+	public Color SelectionColor { get; set; } = Color.Blue;
 
 	/// <summary>
 	/// Called when the item enters the scene tree.
@@ -67,7 +67,7 @@ public class ListviewItem : Entity
 			_bar = new ColorRect()
 			{
 				Size = Size,
-				Color = Color,
+				Color = SelectionColor,
 				IsVisible = _selected,
 			}
 		);

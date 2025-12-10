@@ -167,7 +167,7 @@ public sealed class SoundBank
 		if (sound == null)
 			return null;
 		if (!_instances.TryGetValue(sound, out var instances))
-			_instances[sound] = instances = new();
+			_instances[sound] = instances = [];
 
 		// clear dead old instances:
 

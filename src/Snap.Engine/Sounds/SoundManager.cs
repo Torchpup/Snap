@@ -60,6 +60,9 @@ public sealed class SoundManager
 			throw new Exception($"Bank ID: {bankId} not found in sound banks.");
 		if (sound == null)
 			throw new Exception();
+		
+		if(!sound.IsValid) // Incase it was invicted
+			sound.Load();
 
 		Logger.Instance.Log(LogLevel.Info, $"Playing sound ID: {sound.Id} in sound bank ID: {bankId}.");
 

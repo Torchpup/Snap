@@ -1,6 +1,5 @@
 namespace System;
 
-
 /// <summary>
 /// Provides extension methods for working with the Entity hierarchy, including traversal, querying, and alignment.
 /// </summary>
@@ -28,7 +27,7 @@ public static class EntityExtentions
 	/// <typeparam name="T">The type of descendant to retrieve.</typeparam>
 	/// <param name="e">The entity to search from.</param>
 	/// <returns>The first descendant of type T, or null if not found.</returns>
-	public static T? GetDescendantOfType<T>(this Entity e) where T : Entity =>
+	public static T GetDescendantOfType<T>(this Entity e) where T : Entity =>
         e.GetDescendants().OfType<T>().FirstOrDefault();
 
 	/// <summary>
@@ -38,7 +37,7 @@ public static class EntityExtentions
 	/// <param name="e">The entity to search from.</param>
 	/// <param name="result">The resulting entity of type T if found.</param>
 	/// <returns>True if a descendant of type T was found; otherwise, false.</returns>
-	public static bool TryGetDescendantOfType<T>(this Entity e, out T? result) where T : Entity
+	public static bool TryGetDescendantOfType<T>(this Entity e, out T result) where T : Entity
     {
         foreach (var descendant in e.GetDescendants())
         {
@@ -154,7 +153,7 @@ public static class EntityExtentions
 	/// <param name="e">The entity to calculate from.</param>
 	/// <param name="position">The position to offset from global.</param>
 	/// <returns>The computed world-space position.</returns>
-	public static Vect2 GetworldPosition(this Entity e, Vect2 position)
+	public static Vect2 GetWorldPosition(this Entity e, Vect2 position)
     {
         if (e == null || e.IsExiting)
             return Vect2.Zero;
@@ -210,7 +209,7 @@ public static class EntityExtentions
 	/// <typeparam name="T">The ancestor type to find.</typeparam>
 	/// <param name="e">The entity to search from.</param>
 	/// <returns>The matching ancestor, or null.</returns>
-	public static T? GetAncestorOfType<T>(this Entity e) where T : Entity
+	public static T GetAncestorOfType<T>(this Entity e) where T : Entity
         => e.GetAncestors().OfType<T>().FirstOrDefault();
 
 	/// <summary>
@@ -224,7 +223,7 @@ public static class EntityExtentions
 	/// <returns>
 	/// <c>true</c> if an ancestor of type <typeparamref name="T"/> was found; otherwise, <c>false</c>.
 	/// </returns>
-	public static bool TryGetAncestorOfType<T>(this Entity e, out T? result) where T : Entity
+	public static bool TryGetAncestorOfType<T>(this Entity e, out T result) where T : Entity
     {
         var current = e.Parent;
         while (current != null)
