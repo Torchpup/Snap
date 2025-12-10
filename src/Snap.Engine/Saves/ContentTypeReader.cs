@@ -44,6 +44,23 @@ public sealed class ContentTypeReader : BinaryReader
 		return new Color(r, g, b, a);
 	}
 
+
+	/// <summary>
+	/// Reads a 32-bit integer from the underlying stream and converts it to the specified enum type.
+	/// </summary>
+	/// <typeparam name="T">The type of enum to read.</typeparam>
+	/// <returns>
+	/// The enum value of type <typeparamref name="T"/> corresponding to the integer read from the stream.
+	/// </returns>
+	/// <remarks>
+	/// This method assumes that all enums were written as Int32 values. 
+	/// It does not preserve the original underlying type of the enum.
+	/// </remarks>
+	public T ReadEnum<T>() where T : Enum =>
+		(T)Enum.ToObject(typeof(T), ReadInt32());
+	
+	
+
 	/// <summary>
 	/// Reads an object of type <typeparamref name="T"/> from the current stream using XML deserialization.
 	/// </summary>
