@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>SnapEngine</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Shmellyorc</Authors>
     <Company>Shmellyorc</Company>
     <Description>Snap is a modular C# game engine using SFML, coroutines, pubsub, and more.</Description>
@@ -26,8 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="LICENSE" Pack="true" PackagePath="" />
-    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="" />
+	  <None Include="../../README.md" Pack="true" PackagePath="" />
+	  <None Include="Resources\Files\AppIcon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

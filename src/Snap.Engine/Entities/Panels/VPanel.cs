@@ -122,7 +122,7 @@ public class VPanel : Panel
 			var eWidth = AlignHelpers.AlignWidth(Size.X, width, HAlign);
 			var eHeight = AlignHelpers.AlignHeight(Size.Y, height, VAlign);
 
-			child.Position = new Vect2(eWidth, offset + eHeight);
+			child.Position = new Vect2(eWidth, offset + eHeight).Round();
 
 			offset += child.Size.Y;
 			if (i < allKids.Count - 1)

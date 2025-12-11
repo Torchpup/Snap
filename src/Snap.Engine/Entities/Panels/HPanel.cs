@@ -118,7 +118,7 @@ public class HPanel : Panel
 			var eWidth = AlignHelpers.AlignWidth(Size.X, width, HAlign);
 			var eHeight = AlignHelpers.AlignHeight(Size.Y, height, VAlign);
 
-			child.Position = new Vect2(offset + eWidth, eHeight);
+			child.Position = new Vect2(offset + eWidth, eHeight).Round();
 
 			offset += child.Size.X;
 			if (i < allKids.Count - 1)

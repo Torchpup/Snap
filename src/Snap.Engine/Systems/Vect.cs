@@ -431,6 +431,16 @@ public struct Vect2 : IEquatable<Vect2>
 	#endregion
 
 
+
+	#region Round
+	public readonly Vect2 Round() => Round(this);
+
+	public static Vect2 Round(in Vect2 a)
+		=> new(MathF.Round(a.X), MathF.Round(a.Y));
+	#endregion
+
+
+
 	#region Min
 	/// <summary>
 	/// Returns a vector whose components are the minimum of this vector's and another vector's components.

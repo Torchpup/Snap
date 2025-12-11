@@ -81,9 +81,17 @@ public class Panel : Entity
 		if (children == null || children.Length == 0)
 			return;
 
-		base.AddChild(children);
+		IEnumerator Routine(Entity[] children)
+		{
+			if (Screen == null)
+				yield return new WaitWhile(() => Screen == null);
 
-		SetDirtyState(DirtyState.Update | DirtyState.Sort);
+			base.AddChild(children);
+
+			SetDirtyState(DirtyState.Update | DirtyState.Sort);
+		}
+
+		StartRoutine(Routine(children));
 	}
 
 	/// <summary>
