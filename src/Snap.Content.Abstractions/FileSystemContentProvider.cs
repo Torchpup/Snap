@@ -55,8 +55,8 @@ public sealed class FileSystemContentProvider : IContentProvider
 		{
 			// return logical, content-root-relative paths with forward slashes
 			var rel = Path.GetRelativePath(_rootAbs, f)
-						 .Replace('\\', '/')
-						 .TrimStart('/');
+						  .Replace('\\', '/')
+						  .TrimStart('/');
 			yield return rel;
 		}
 	}

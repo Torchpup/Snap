@@ -262,7 +262,7 @@ public sealed class AssetManager
 		if (!TryResolveLogicalPath(filename, TextureExtentions, out var path))
 			throw new FileNotFoundException($"Asset not found: {filename}");
 
-			return new Texture(Id++, path, repeat, smooth);
+		return new Texture(Id++, path, repeat, smooth);
 	}
 
 	/// <summary>

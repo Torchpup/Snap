@@ -58,7 +58,7 @@ switch (args[0])
 				return 1;
 			}
 
-			PackBuilder.Build(new PackOptions
+			PackBuilder.Build(new Snap.Pack.Core.PackOptions
 			{
 				InputDir = input,
 				OutFile = outFile,

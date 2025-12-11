@@ -283,7 +283,7 @@ public class Game : IDisposable
 		{
 			throw new InvalidOperationException(
 				"Cannot create Engine: EngineSettings must be initialized. " +
-				"Make sure you call EngineSettingsBuilder.Build() before passing it in."
+				"Make sure you call EngineSettings.Build() before passing it in."
 			);
 		}
 
