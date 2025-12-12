@@ -4,15 +4,20 @@ namespace Snap.Engine.Systems;
 /// Represents a 2D vector using floating-point components (X, Y).
 /// Supports common vector operations, arithmetic, and geometric transformations.
 /// </summary>
-public struct Vect2 : IEquatable<Vect2>
+/// <remarks>
+/// Initializes a new instance of the <see cref="Vect2"/> struct with the specified components.
+/// </remarks>
+/// <param name="x">The X component.</param>
+/// <param name="y">The Y component.</param>
+public struct Vect2(float x, float y) : IEquatable<Vect2>
 {
 	private const float Epsilon = 1e-6f;
 
 	/// <summary>Gets or sets the X component of the vector.</summary>
-	public float X;
+	public float X = x;
 
 	/// <summary>Gets or sets the Y component of the vector.</summary>
-	public float Y;
+	public float Y = y;
 
 	#region Properties
 	/// <summary>Gets a vector with both components set to zero (0, 0).</summary>
@@ -35,19 +40,9 @@ public struct Vect2 : IEquatable<Vect2>
 
 	/// <summary>Gets a value indicating whether this vector is effectively zero, within a small epsilon.</summary>
 	public readonly bool IsZero => MathF.Abs(X) < Epsilon && MathF.Abs(Y) < Epsilon;
-	#endregion
 
+	#endregion
 	#region Constructors
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Vect2"/> struct with the specified components.
-	/// </summary>
-	/// <param name="x">The X component.</param>
-	/// <param name="y">The Y component.</param>
-	public Vect2(float x, float y)
-	{
-		X = x;
-		Y = y;
-	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Vect2"/> struct with both components set to the same value.
@@ -290,21 +285,21 @@ public struct Vect2 : IEquatable<Vect2>
 	/// </summary>
 	/// <param name="obj">The object to compare with.</param>
 	/// <returns><c>true</c> if the object is a vector and equal to this vector; otherwise, <c>false</c>.</returns>
-	public readonly override bool Equals([NotNullWhen(true)] object obj) =>
+	public override readonly bool Equals([NotNullWhen(true)] object obj) =>
 		obj is Vect2 value && Equals(value);
 
 	/// <summary>
 	/// Gets the hash code for this vector.
 	/// </summary>
 	/// <returns>The hash code.</returns>
-	public readonly override int GetHashCode() => HashCode.Combine(X, Y);
+	public override readonly int GetHashCode() => HashCode.Combine(X, Y);
 
 	/// <summary>
 	/// Returns a string representation of this vector.
 	/// </summary>
 	/// <returns>A string in the format "Vect(X, Y)".</returns>
 
-	public readonly override string ToString() => $"Vect({X}, {Y})";
+	public override readonly string ToString() => $"Vect({X}, {Y})";
 	#endregion
 
 
@@ -433,10 +428,53 @@ public struct Vect2 : IEquatable<Vect2>
 
 
 	#region Round
+	/// <summary>
+	/// Rounds both components of this vector to the nearest integer.
+	/// </summary>
+	/// <returns>A new <see cref="Vect2"/> with X and Y rounded to the nearest integer.</returns>
 	public readonly Vect2 Round() => Round(this);
 
+	/// <summary>
+	/// Rounds both components of the given vector to the nearest integer.
+	/// </summary>
+	/// <param name="a">The vector to round.</param>
+	/// <returns>A new <see cref="Vect2"/> with X and Y rounded to the nearest integer.</returns>
 	public static Vect2 Round(in Vect2 a)
 		=> new(MathF.Round(a.X), MathF.Round(a.Y));
+
+	/// <summary>
+	/// Rounds both components of this vector to the specified number of fractional digits.
+	/// </summary>
+	/// <param name="digits">
+	/// The number of fractional digits (0–6).  
+	/// 0 = round to integer, 1 = tenths, 2 = hundredths, etc.
+	/// </param>
+	/// <returns>A new <see cref="Vect2"/> with X and Y rounded to the given precision.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown if <paramref name="digits"/> is less than 0 or greater than 6.
+	/// </exception>
+	public readonly Vect2 Round(int digits) => Round(this, digits);
+
+	/// <summary>
+	/// Rounds both components of the given vector to the specified number of fractional digits.
+	/// </summary>
+	/// <param name="a">The vector to round.</param>
+	/// <param name="digits">
+	/// The number of fractional digits (0–6).  
+	/// 0 = round to integer, 1 = tenths, 2 = hundredths, etc.
+	/// </param>
+	/// <returns>A new <see cref="Vect2"/> with X and Y rounded to the given precision.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown if <paramref name="digits"/> is less than 0 or greater than 6.
+	/// </exception>
+	public static Vect2 Round(in Vect2 a, int digits)
+	{
+		return digits switch
+		{
+			< 0 or > 6 => throw new ArgumentOutOfRangeException(nameof(digits)),
+			_ => new(MathF.Round(a.X, digits), MathF.Round(a.Y, digits))
+		};
+	}
 	#endregion
 
 
@@ -920,6 +958,7 @@ public struct Vect2 : IEquatable<Vect2>
 		var sin = MathF.Sin(radians);
 		var newX = X * cos - Y * sin;
 		var newY = X * sin + Y * cos;
+
 		X = newX;
 		Y = newY;
 	}
@@ -929,10 +968,11 @@ public struct Vect2 : IEquatable<Vect2>
 	/// </summary>
 	/// <param name="radians">The angle in radians.</param>
 	/// <returns>The rotated vector.</returns>
-	public Vect2 Rotated(float radians)
+	public readonly Vect2 Rotated(float radians)
 	{
 		var cos = MathF.Cos(radians);
 		var sin = MathF.Sin(radians);
+
 		return new Vect2(X * cos - Y * sin, X * sin + Y * cos);
 	}
 	#endregion

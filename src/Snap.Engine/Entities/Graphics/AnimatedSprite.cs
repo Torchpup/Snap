@@ -249,7 +249,7 @@ public sealed class AnimatedSprite : Entity
 
 		var rects = frames.Select(idx =>
 		{
-			var tile = MathHelpers.To2D(idx, tilesPerRow);
+			var tile = MapHelpers.To2D(idx, tilesPerRow);
 			var pixelPos = new Vect2(tile.X * grid.X, tile.Y * grid.Y);
 			return new Rect2(pixelPos, grid);
 		})

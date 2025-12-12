@@ -66,23 +66,7 @@ public static class MathHelpers
 			: (current - target) / 2f;
 	}
 
-	/// <summary>
-	/// Converts a 1‑dimensional tile index into a 2D coordinate.
-	/// </summary>
-	/// <param name="index">The flat index.</param>
-	/// <param name="tilesize">The width (and height) of the tile grid.</param>
-	/// <returns>A <see cref="Vect2"/> representing the (x, y) tile position.</returns>
-	public static Vect2 To2D(int index, int tilesize) =>
-		new(index % tilesize, index / tilesize);
-
-	/// <summary>
-	/// Converts a 2D tile coordinate into a 1‑dimensional index.
-	/// </summary>
-	/// <param name="location">The (x, y) tile position.</param>
-	/// <param name="tilesize">The width (and height) of the tile grid.</param>
-	/// <returns>The flat index corresponding to <paramref name="location"/>.</returns>
-	public static int To1D(Vect2 location, int tilesize) =>
-		(int)location.Y * tilesize + (int)location.X;
+	
 
 	/// <summary>
 	/// Wraps an integer value into the range [<paramref name="min"/>, <paramref name="max"/>).

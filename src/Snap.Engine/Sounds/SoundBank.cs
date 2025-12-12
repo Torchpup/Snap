@@ -1,5 +1,13 @@
 namespace Snap.Engine.Sounds;
 
+/// <summary>
+/// Provides centralized management of audio assets such as sound effects and music.
+/// </summary>
+/// <remarks>
+/// The <c>SoundBank</c> class is responsible for loading, caching, and retrieving audio resources.
+/// It is declared <c>sealed</c> to prevent inheritance and ensure consistent audio handling.
+/// Typical usage involves registering sounds by key and retrieving them for playback.
+/// </remarks>
 public sealed class SoundBank
 {
 	private class SoundInstanceWrapped
@@ -12,6 +20,19 @@ public sealed class SoundBank
 	private readonly float _evictAfterMinutes;
 	private readonly Dictionary<Sound, List<SoundInstanceWrapped>> _instances = new(128);
 
+	/// <summary>
+	/// Gets a read-only dictionary mapping each <see cref="Sound"/> to its active <see cref="SoundInstance"/>s.
+	/// </summary>
+	/// <remarks>
+	/// This property flattens the internal collection of <see cref="SoundInstanceWrapped"/> objects into their underlying
+	/// <see cref="SoundInstance"/> values, filtering out any null entries.  
+	/// A new dictionary is constructed on each access to ensure immutability and encapsulation of the internal state.  
+	/// Consumers receive a <see cref="ReadOnlyDictionary{TKey,TValue}"/> that cannot be modified.
+	/// </remarks>
+	/// <returns>
+	/// A <see cref="ReadOnlyDictionary{TKey,TValue}"/> where each key is a <see cref="Sound"/> and each value is a
+	/// <see cref="List{T}"/> of active <see cref="SoundInstance"/>s associated with that sound.
+	/// </returns>
 	public ReadOnlyDictionary<Sound, List<SoundInstance>> Instances
 	{
 		get
@@ -37,9 +58,32 @@ public sealed class SoundBank
 		}
 	}
 
+	/// <summary>
+	/// Gets the number of sound instances that are currently invalid.
+	/// </summary>
+	/// <remarks>
+	/// This property flattens all <see cref="SoundInstanceWrapped"/> collections in <c>_instances</c> and counts
+	/// the number of entries where <see cref="SoundInstance.IsValid"/> is <c>false</c>.  
+	/// It provides a quick way to determine how many sound instances have expired or are no longer usable.
+	/// </remarks>
 	public int Count => _instances.SelectMany(x => x.Value).Count(x => !x.Instance.IsValid);
+
+	/// <summary>
+	/// Gets the unique identifier assigned to this sound manager or entity.
+	/// </summary>
+	/// <remarks>
+	/// The identifier is set internally and exposed as a read-only property.  
+	/// It can be used to distinguish between multiple sound managers or entities in the system.
+	/// </remarks>
 	public uint Id { get; private set; }
 
+	/// <summary>
+	/// Gets or sets the stereo pan value for this sound instance.
+	/// </summary>
+	/// <remarks>
+	/// The value is clamped between -1.0 (full left) and 1.0 (full right).  
+	/// Setting this property triggers <c>Update()</c> to apply the change.
+	/// </remarks>
 	public float Pan
 	{
 		get => _pan;
@@ -53,6 +97,13 @@ public sealed class SoundBank
 		}
 	}
 
+	/// <summary>
+	/// Gets or sets the volume level for this sound instance.
+	/// </summary>
+	/// <remarks>
+	/// The value is clamped between 0.0 (silent) and 1.0 (full volume).  
+	/// Setting this property triggers <c>Update()</c> to apply the change.
+	/// </remarks>
 	public float Volume
 	{
 		get => _volume;
@@ -66,6 +117,14 @@ public sealed class SoundBank
 		}
 	}
 
+	/// <summary>
+	/// Gets or sets the pitch adjustment for this sound instance.
+	/// </summary>
+	/// <remarks>
+	/// The value is clamped between -3.0 and 3.0, where 0.0 represents the original pitch.  
+	/// Negative values lower the pitch, positive values raise it.  
+	/// Setting this property triggers <c>Update()</c> to apply the change.
+	/// </remarks>
 	public float Pitch
 	{
 		get => _pitch;
@@ -170,7 +229,6 @@ public sealed class SoundBank
 			_instances[sound] = instances = [];
 
 		// clear dead old instances:
-
 		EvictSound(instances);
 
 		var inst = sound.CreateInstance();

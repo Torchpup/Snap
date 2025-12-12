@@ -140,29 +140,6 @@ public sealed class LDTKProject : IAsset
 	}
 
 
-	#region Helpers
-	/// <summary>
-	/// Converts a tile-based grid location into world-space coordinates.
-	/// </summary>
-	/// <param name="location">The grid location.</param>
-	/// <param name="tilesize">The size of one tile.</param>
-	/// <returns>World-space coordinates in pixels.</returns>
-	public static Vect2 MapToWorld(in Vect2 location, int tilesize)
-		=> Vect2.Floor(location * tilesize);
-
-	/// <summary>
-	/// Converts a world-space position into map grid coordinates.
-	/// </summary>
-	/// <param name="position">World-space position.</param>
-	/// <param name="tilesize">The size of one tile.</param>
-	/// <returns>Tile-based grid coordinates.</returns>
-	public static Vect2 WorldToMap(in Vect2 position, int tilesize)
-		=> Vect2.Floor(position / tilesize);
-
-
-	#endregion
-
-
 	#region Entity
 	/// <summary>
 	/// Retrieves a map entity instance using its hashed ID.

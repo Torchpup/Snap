@@ -8,7 +8,7 @@ namespace Snap.Engine.Graphics.Atlas;
 /// to efficiently allocate space for sub-textures. It tracks used pixel count but does not 
 /// support true removal under the Skyline packing algorithm.
 /// </remarks>
-public class AtlasPage
+public sealed class AtlasPage
 {
 	/// <summary>
 	/// Gets the zero-based index of this atlas page within the atlas manager.
@@ -35,7 +35,7 @@ public class AtlasPage
 	/// </summary>
 	/// <param name="pageSize">The width and height of the page in pixels. Pages are always square.</param>
 	/// <param name="pageIndex">The zero-based index of this page within the atlas manager.</param>
-	public AtlasPage(int pageSize, int pageIndex)
+	internal AtlasPage(int pageSize, int pageIndex)
     {
         PageIndex = pageIndex;
         Packer = new SkylinePacker(pageSize, pageSize);

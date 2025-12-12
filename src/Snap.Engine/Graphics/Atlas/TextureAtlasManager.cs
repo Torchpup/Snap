@@ -133,10 +133,10 @@ public sealed class TextureAtlasManager
 			return info.Handle;
 		}
 
-		AtlasHandle handle;
+		// AtlasHandle handle;
 
 		// Try packing straight away (no eviction)
-		if (TryPackIntoAnyPage(srcTexture, srcRect, out handle))
+		if (TryPackIntoAnyPage(srcTexture, srcRect, out var handle))
 		{
 			_registered[key] = new SliceInfo { Handle = handle, LastUsedUtc = DateTime.UtcNow };
 			return handle;
@@ -145,10 +145,10 @@ public sealed class TextureAtlasManager
 		// Evict truly idle slices
 		// EvictStaleSlices(MaxIdle);
 
-		if (TryPackIntoAnyPage(srcTexture, srcRect, out handle))
+		if (TryPackIntoAnyPage(srcTexture, srcRect, out var otherHandle))
 		{
 			_registered[key] = new SliceInfo { Handle = handle, LastUsedUtc = DateTime.UtcNow };
-			return handle;
+			return otherHandle;
 		}
 
 		// LRU eviction: remove oldest one by one until it fits
@@ -157,10 +157,10 @@ public sealed class TextureAtlasManager
 			.Select(kv => kv.Key)
 			.ToList();
 
-		foreach (var evictKey in lruList)
+		foreach (var (texHandle, rect) in lruList)
 		{
 			// remove from page & registry
-			RemoveSlice(evictKey.texHandle, evictKey.rect);
+			RemoveSlice(texHandle, rect);
 
 			if (TryPackIntoAnyPage(srcTexture, srcRect, out handle))
 			{

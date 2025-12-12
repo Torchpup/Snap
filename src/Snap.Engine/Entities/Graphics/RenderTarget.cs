@@ -4,7 +4,11 @@ namespace Snap.Engine.Entities.Graphics;
 /// A render target panel that renders entities or draw commands into an offscreen texture,
 /// which can then be drawn to the main screen. Supports batching, draw ordering, and texture atlasing.
 /// </summary>
-public class RenderTarget : Panel
+/// <remarks>
+/// Initializes a new instance of the <see cref="RenderTarget"/> class.
+/// </remarks>
+/// <param name="entities">Optional child entities to add to this panel.</param>
+public class RenderTarget(params Entity[] entities) : Panel(entities)
 {
 	private const int MaxDrawCalls = 256;
 	private const int MaxVerticies = 6;
@@ -56,12 +60,6 @@ public class RenderTarget : Panel
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="RenderTarget"/> class.
-	/// </summary>
-	/// <param name="entities">Optional child entities to add to this panel.</param>
-	public RenderTarget(params Entity[] entities) : base(entities) { }
-
-	/// <summary>
 	/// Called when the entity enters the scene. Initializes vertex buffer, render texture, and view.
 	/// Throws if size is invalid or if nested RenderTargets are detected.
 	/// </summary>
@@ -89,19 +87,16 @@ public class RenderTarget : Panel
 		base.OnEnter();
 	}
 
-	private void EnqueueCommand(
-		uint texHandle,
-		SFTexture tex,
-		SFVertex[] quad,
-		int depth
-	)
+	private void EnqueueCommand(uint texHandle, SFTexture tex, SFVertex[] quad, int depth)
 	{
 		if (!_drawCommands.TryGetValue(texHandle, out var list))
 		{
-			list = new List<DrawCommand>();
+			list = [];
 			_drawCommands[texHandle] = list;
 		}
+
 		list.Add(new DrawCommand(tex, quad, depth, _seqCounter++));
+
 		// _allCommands.Add(cmd);
 	}
 
@@ -247,31 +242,324 @@ public class RenderTarget : Panel
 	}
 
 
+	/// <summary>
+	/// Draws a texture to the current render target with the specified transform and effects.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="dstRect">
+	/// The destination rectangle in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="srcRect">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="origin">
+	/// Optional origin point for rotation and scaling. If <c>null</c>, defaults to the texture’s center.
+	/// </param>
+	/// <param name="scale">
+	/// Optional scale factor. If <c>null</c>, defaults to (1,1).
+	/// </param>
+	/// <param name="rotation">
+	/// Rotation angle in radians (or degrees, depending on your engine convention).
+	/// </param>
+	/// <param name="effects">
+	/// Texture effects to apply (e.g., flipping, mirroring).
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This method delegates to <c>EngineDraw</c>, which performs the actual rendering.
+	/// It provides a unified interface for drawing textures with transformations, color tinting,
+	/// and optional effects.
+	/// </remarks>
 	public void Draw(Texture texture, Rect2 dstRect, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDraw(texture, dstRect, srcRect, color, origin, scale, rotation, effects, depth);
-	public void Draw(Texture texture, Rect2 Rect, Color color, Vect2? origin = null,
+
+	/// <summary>
+	/// Draws an entire texture to the current render target with the specified transform and effects.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="rect">
+	/// The destination rectangle in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="origin">
+	/// Optional origin point for rotation and scaling. If <c>null</c>, defaults to the texture’s center.
+	/// </param>
+	/// <param name="scale">
+	/// Optional scale factor. If <c>null</c>, defaults to (1,1).
+	/// </param>
+	/// <param name="rotation">
+	/// Rotation angle in radians (or degrees, depending on your engine convention).
+	/// </param>
+	/// <param name="effects">
+	/// Texture effects to apply (e.g., flipping, mirroring).
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload automatically uses <see cref="Texture.Bounds"/> as the source rectangle,
+	/// making it convenient for drawing the entire texture without specifying a source region.
+	/// </remarks>
+	public void Draw(Texture texture, Rect2 rect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
-		EngineDraw(texture, Rect, texture.Bounds, color, origin, scale, rotation, effects, depth);
+		EngineDraw(texture, rect, texture.Bounds, color, origin, scale, rotation, effects, depth);
+
+	/// <summary>
+	/// Draws a portion of a texture at the specified position with the given transform and effects.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="position">
+	/// The position in render target coordinates where the source rectangle will be drawn.
+	/// </param>
+	/// <param name="srcRect">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="origin">
+	/// Optional origin point for rotation and scaling. If <c>null</c>, defaults to the center of <paramref name="srcRect"/>.
+	/// </param>
+	/// <param name="scale">
+	/// Optional scale factor. If <c>null</c>, defaults to (1,1).
+	/// </param>
+	/// <param name="rotation">
+	/// Rotation angle in radians (or degrees, depending on your engine convention).
+	/// </param>
+	/// <param name="effects">
+	/// Texture effects to apply (e.g., flipping, mirroring).
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload constructs the destination rectangle from the specified <paramref name="position"/> and
+	/// the size of <paramref name="srcRect"/>, then delegates to <c>EngineDraw</c>.
+	/// </remarks>
 	public void Draw(Texture texture, Vect2 position, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDraw(texture, new(position, srcRect.Size), srcRect, color, origin, scale, rotation, effects, depth);
+
+	/// <summary>
+	/// Draws a portion of a texture at the specified position with a tint color and depth.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="position">
+	/// The position in render target coordinates where the source rectangle will be drawn.
+	/// </param>
+	/// <param name="srcRect">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload constructs the destination rectangle from the specified <paramref name="position"/> and
+	/// the size of <paramref name="srcRect"/>, then delegates to <c>EngineDraw</c>.  
+	/// It omits optional transform parameters (origin, scale, rotation, effects) for convenience when drawing
+	/// untransformed sprites.
+	/// </remarks>
 	public void Draw(Texture texture, Vect2 position, Rect2 srcRect, Color color, int depth = 0) =>
 		EngineDraw(texture, new Rect2(position, srcRect.Size), srcRect, color, depth: depth);
 
+	/// <summary>
+	/// Draws text using the specified font at the given position with a tint color and depth.
+	/// </summary>
+	/// <param name="font">
+	/// The <see cref="Font"/> to use for rendering the text.
+	/// </param>
+	/// <param name="text">
+	/// The string content to draw.
+	/// </param>
+	/// <param name="position">
+	/// The position in render target coordinates where the text will be drawn.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the text.
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload delegates to <c>EngineDrawText</c>, providing a simplified interface for text rendering.
+	/// It omits optional transform parameters (origin, scale, rotation, effects) for convenience when drawing
+	/// untransformed text.
+	/// </remarks>
 	public void DrawText(Font font, string text, Vect2 position, Color color, int depth = 0)
 		=> EngineDrawText(font, text, position, color, depth);
 
+	/// <summary>
+	/// Draws a texture directly to the render target, bypassing the engine's internal atlas batching.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="dstRect">
+	/// The destination rectangle in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="srcRect">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="origin">
+	/// Optional origin point for rotation and scaling. If <c>null</c>, defaults to the center of <paramref name="srcRect"/>.
+	/// </param>
+	/// <param name="scale">
+	/// Optional scale factor. If <c>null</c>, defaults to (1,1).
+	/// </param>
+	/// <param name="rotation">
+	/// Rotation angle in radians (or degrees, depending on your engine convention).
+	/// </param>
+	/// <param name="effects">
+	/// Texture effects to apply (e.g., flipping, mirroring).
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// Unlike the standard <c>Draw</c> methods, this overload calls <c>EngineDrawBypassAtlas</c> to skip the engine's
+	/// built‑in atlas batching.  
+	/// Use this when you need direct control over texture rendering, or when atlas management would cause
+	/// unwanted side effects (e.g., custom shaders, dynamic textures).
+	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 dstRect, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, dstRect, srcRect, color, origin, scale, rotation, effects, depth);
+
+	/// <summary>
+	/// Draws a portion of a texture at the specified position, bypassing the engine's internal atlas batching.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="position">
+	/// The position in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="srcRect">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="origin">
+	/// Optional origin point for rotation and scaling. If <c>null</c>, defaults to the center of <paramref name="srcRect"/>.
+	/// </param>
+	/// <param name="scale">
+	/// Optional scale factor. If <c>null</c>, defaults to (1,1).
+	/// </param>
+	/// <param name="rotation">
+	/// Rotation angle in radians (or degrees, depending on your engine convention).
+	/// </param>
+	/// <param name="effects">
+	/// Texture effects to apply (e.g., flipping, mirroring).
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload constructs the destination rectangle from the specified <paramref name="position"/> and the
+	/// texture’s size, then delegates to <c>EngineDrawBypassAtlas</c>.  
+	/// Use this when you need direct control over rendering without atlas batching, such as dynamic textures
+	/// or custom shaders.
+	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Vect2 position, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, new Rect2(position, texture.Size), srcRect, color, origin, scale, rotation, effects, depth);
+
+	/// <summary>
+	/// Draws an entire texture into the specified destination rectangle, bypassing the engine's internal atlas batching.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="rect">
+	/// The destination rectangle in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload automatically uses <see cref="Texture.Bounds"/> as the source rectangle, ensuring the entire texture
+	/// is drawn.  
+	/// Unlike the standard <c>Draw</c> methods, this bypasses the engine's atlas batching by calling
+	/// <c>EngineDrawBypassAtlas</c>.  
+	/// Use this when you need direct control over rendering without atlas batching, such as dynamic textures,
+	/// custom shaders, or debugging raw draw behavior.
+	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 rect, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, rect, texture.Bounds, color, depth: depth);
+
+	/// <summary>
+	/// Draws an entire texture at the specified position, bypassing the engine's internal atlas batching.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="position">
+	/// The position in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload constructs the destination rectangle from the specified <paramref name="position"/> and the
+	/// texture’s size, then delegates to <c>EngineDrawBypassAtlas</c>.  
+	/// Unlike the standard <c>Draw</c> methods, this bypasses the engine’s atlas batching, making it useful for
+	/// direct rendering of dynamic textures, debugging, or cases where batching is undesirable.
+	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Vect2 position, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, new Rect2(position, texture.Size), texture.Bounds, color, depth: depth);
+
+	/// <summary>
+	/// Draws a portion of a texture into the specified destination rectangle, bypassing the engine's internal atlas batching.
+	/// </summary>
+	/// <param name="texture">
+	/// The <see cref="Texture"/> to draw.
+	/// </param>
+	/// <param name="dst">
+	/// The destination rectangle in render target coordinates where the texture will be drawn.
+	/// </param>
+	/// <param name="src">
+	/// The source rectangle within the texture to sample from.
+	/// </param>
+	/// <param name="color">
+	/// The tint color to apply to the texture.
+	/// </param>
+	/// <param name="depth">
+	/// The draw order depth. Higher values may render above lower values.
+	/// </param>
+	/// <remarks>
+	/// This overload delegates to <c>EngineDrawBypassAtlas</c>, allowing explicit control over both source and destination rectangles.  
+	/// Unlike the standard <c>Draw</c> methods, this bypasses the engine’s atlas batching, making it useful for direct rendering
+	/// of dynamic textures, debugging, or cases where batching is undesirable.
+	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 dst, Rect2 src, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, dst, src, color, depth: depth);
 
@@ -406,11 +694,13 @@ public class RenderTarget : Panel
 			effects);
 
 		uint textureId = texture.Handle;
+
 		if (!_drawCommands.TryGetValue(textureId, out var list))
 		{
-			list = new List<DrawCommand>();
+			list = [];
 			_drawCommands[textureId] = list;
 		}
+
 		list.Add(new DrawCommand(texture, quad, depth, _seqCounter++));
 	}
 
@@ -442,6 +732,20 @@ public class RenderTarget : Panel
 		EnqueueDraw(texture, srcInt, dstRect, color, origin, scale, rotation, effects, depth);
 	}
 
+	/// <summary>
+	/// Waits until the renderer has completed its work, then invokes the specified callback.
+	/// </summary>
+	/// <param name="onReady">
+	/// An <see cref="Action"/> to invoke once rendering is finished. If <c>null</c>, no callback is executed.
+	/// </param>
+	/// <returns>
+	/// An <see cref="IEnumerator"/> suitable for use with Unity coroutines. The coroutine yields until
+	/// <c>IsRendering</c> becomes <c>false</c>.
+	/// </returns>
+	/// <remarks>
+	/// This method uses <see cref="WaitWhile"/> to suspend execution while <c>IsRendering</c> is true.
+	/// Once rendering completes, the provided callback is invoked.
+	/// </remarks>
 	protected IEnumerator WaitForRenderer(Action onReady)
 	{
 		yield return new WaitWhile(() => IsRendering);

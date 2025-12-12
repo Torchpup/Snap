@@ -18,13 +18,15 @@ namespace Snap.Engine.Graphics.Atlas;
 /// Once no space can be found for a requested rectangle, the pack attempt will fail.
 /// </para>
 /// </remarks>
-public class SkylinePacker
+public sealed class SkylinePacker
 {
-	private class Node
+	private struct Node
 	{
-		public int X, Y, Width;
+		public int X;
+		public int Y;
+		public int Width;
 
-		public Node(int x, int y, int width)
+		internal Node(int x, int y, int width)
 		{
 			X = x;
 			Y = y;
@@ -36,24 +38,11 @@ public class SkylinePacker
 	private readonly int _pageHeight;
 	private readonly List<Node> _nodes;
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="SkylinePacker"/> class.
-	/// </summary>
-	/// <param name="pageWidth">The total width of the packing area, in pixels.</param>
-	/// <param name="pageHeight">The total height of the packing area, in pixels.</param>
-	/// <remarks>
-	/// The skyline packer will attempt to place rectangles within this fixed-size area 
-	/// using the skyline algorithm. Once no placement can be found for a requested rectangle, 
-	/// packing attempts will fail.
-	/// </remarks>
-	public SkylinePacker(int pageWidth, int pageHeight)
+	internal SkylinePacker(int pageWidth, int pageHeight)
 	{
 		_pageWidth = pageWidth;
 		_pageHeight = pageHeight;
-
-		_nodes = new List<Node> {
-			new(0, 0, pageWidth)
-		};
+		_nodes = [new(0, 0, pageWidth)];
 	}
 
 	/// <summary>
@@ -108,7 +97,7 @@ public class SkylinePacker
 		if (bestIndex == -1)
 			return null;
 
-		SFRectI rect = new SFRectI(bestX, bestY, w, h);
+		var rect = new SFRectI(bestX, bestY, w, h);
 
 		AddSkylineLevel(bestIndex, rect);
 		Merge();
@@ -123,7 +112,7 @@ public class SkylinePacker
 		if (node.X + w > _pageWidth)
 			return -1;
 
-		int x = node.X;
+		// int x = node.X;
 		int width = w;
 		int y = node.Y;
 		int i = index;
@@ -141,7 +130,7 @@ public class SkylinePacker
 
 	private void AddSkylineLevel(int index, SFRectI rect)
 	{
-		var node = _nodes[index];
+		// var node = _nodes[index];
 		var newNode = new Node(rect.Left, rect.Top + rect.Height, rect.Width);
 
 		_nodes.Insert(index, newNode);

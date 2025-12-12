@@ -68,7 +68,7 @@ public class Camera
 	/// Initializes a new instance of the <see cref="Camera"/> class.
 	/// </summary>
 	/// <param name="screen">The screen associated with this camera.</param>
-	public Camera(Screen screen)
+	internal Camera(Screen screen)
 	{
 		_isFlying = false;
 		_shakeDuration = 0f;

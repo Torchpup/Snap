@@ -4,7 +4,11 @@ namespace Snap.Engine.FSM;
 /// A simple finite state machine that manages state transitions for an owner of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T">The type of the object that owns and drives this state machine.</typeparam>
-public sealed class StateMachine<T>
+/// <remarks>
+/// Initializes a new instance of the <see cref="StateMachine{T}"/> class.
+/// </remarks>
+/// <param name="owner">The object that owns and drives this state machine.</param>
+public sealed class StateMachine<T>(T owner)
 {
 	// Holds a requested state change until the next Update cycle.
 	private IState<T> _pendingState;
@@ -12,18 +16,12 @@ public sealed class StateMachine<T>
 	/// <summary>
 	/// Gets the instance of <typeparamref name="T"/> that this state machine controls.
 	/// </summary>
-	public T Owner { get; }
+	public T Owner { get; } = owner;
 
 	/// <summary>
 	/// Gets the currently active state. May be <c>null</c> if no state has been entered yet.
 	/// </summary>
 	public IState<T> Current { get; private set; }
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="StateMachine{T}"/> class.
-	/// </summary>
-	/// <param name="owner">The object that owns and drives this state machine.</param>
-	public StateMachine(T owner) => Owner = owner;
 
 	/// <summary>
 	/// Requests a transition to a new state. The actual swap will occur at the start of the next <see cref="Update(float)"/> call.

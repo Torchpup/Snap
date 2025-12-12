@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+<!-- Dont care for IDE0046: Dont need to simplifty if statements -->
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoWarn>NETSDK1206</NoWarn>
+    <NoWarn>NETSDK1206;IDE0046;</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>SnapEngine</PackageId>

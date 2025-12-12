@@ -2,37 +2,140 @@
 
 namespace Snap.Engine;
 
-public class WindowCreationException : Exception
+/// <summary>
+/// Represents errors that occur during the creation of a game window.
+/// </summary>
+/// <remarks>
+/// This exception is thrown when the engine fails to initialize or create a rendering window.  
+/// It can wrap an inner exception to provide additional context about the underlying failure.
+/// </remarks>
+public sealed class WindowCreationException : Exception
 {
+	/// <summary>
+	/// Initializes a new instance of the <see cref="WindowCreationException"/> class with a specified error message.
+	/// </summary>
+	/// <param name="message">
+	/// A descriptive message that explains the reason for the window creation failure.
+	/// </param>
 	public WindowCreationException(string message)
 		: base(message) { }
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="WindowCreationException"/> class with a specified error message
+	/// and a reference to the inner exception that caused this exception.
+	/// </summary>
+	/// <param name="message">
+	/// A descriptive message that explains the reason for the window creation failure.
+	/// </param>
+	/// <param name="inner">
+	/// The exception that is the cause of the current exception, or <c>null</c> if no inner exception is specified.
+	/// </param>
 	public WindowCreationException(string message, Exception inner)
 		: base(message, inner) { }
 }
 
+/// <summary>
+/// Represents the core game instance, responsible for managing engine state, settings, input,
+/// and application lifecycle.
+/// </summary>
+/// <remarks>
+/// <see cref="Game"/> is the central entry point of the engine.  
+/// It enforces a singleton instance via <see cref="Game.Instance"/> and provides access to
+/// engine settings, input mapping, version information, and application directories.  
+/// 
+/// Because <see cref="Game"/> implements <see cref="IDisposable"/>, it must be properly disposed
+/// to release unmanaged resources, close windows, and flush pending operations.  
+/// Typical usage involves creating the game instance, running the main loop, and disposing
+/// it at shutdown.
+/// </remarks>
 public class Game : IDisposable
 {
 	private const int TotalFpsQueueSamples = 16;
-
-	private SFRenderWindow _window;
 	private SFStyles _styles;
 	private SFContext _context;
 	SFVideoMode _videoMode;
 	private bool _isDisposed, _initialized;
-	private readonly Queue<float> _fpsQueue = new();
+	private readonly Queue<float> _fpsQueue = [];
 	private float _titleTimeout;
 	private readonly SFImage _icon;
 	private bool _canApplyChanges;
 
+	/// <summary>
+	/// Gets the singleton instance of the <see cref="Game"/>.
+	/// </summary>
+	/// <remarks>
+	/// The engine enforces a single global <see cref="Game"/> instance to manage runtime state,
+	/// settings, input, and application folders.
+	/// </remarks>
 	public static Game Instance { get; private set; }
+
+	/// <summary>
+	/// Gets the engine settings associated with this game instance.
+	/// </summary>
+	/// <remarks>
+	/// Provides access to configuration values such as application name, company, directories,
+	/// and rendering options.
+	/// </remarks>
 	public EngineSettings Settings { get; }
+
+	/// <summary>
+	/// Gets a value indicating whether the game is currently active.
+	/// </summary>
+	/// <remarks>
+	/// Defaults to <c>true</c>. This property can be toggled internally by the engine
+	/// to reflect focus or suspension state.
+	/// </remarks>
 	public bool IsActive { get; private set; } = true;
+
+	/// <summary>
+	/// Gets the version string of the currently executing assembly.
+	/// </summary>
+	/// <remarks>
+	/// This property retrieves the version metadata from the assembly manifest.
+	/// </remarks>
 	public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+	/// <summary>
+	/// Gets a hashed representation of the current <see cref="Version"/>.
+	/// </summary>
+	/// <remarks>
+	/// Uses <see cref="HashHelpers.Hash64(string)"/> to generate a 64-bit hash of the version string,
+	/// formatted as an 8-character hexadecimal value.
+	/// </remarks>
 	public string VersionHash => $"{HashHelpers.Hash64(Version):X8}";
+
+	/// <summary>
+	/// Gets the input map for the game.
+	/// </summary>
+	/// <remarks>
+	/// Provides access to input bindings and state, allowing the engine to query
+	/// keyboard, mouse, and controller inputs.
+	/// </remarks>
 	public InputMap Input { get; private set; }
+
+	/// <summary>
+	/// Gets the root application data folder for the game.
+	/// </summary>
+	/// <remarks>
+	/// The folder path is resolved using <see cref="FileHelpers.GetApplicationData(string,string)"/> 
+	/// with the company and application name from <see cref="Settings"/>.
+	/// </remarks>
 	public string ApplicationFolder => FileHelpers.GetApplicationData(Settings.AppCompany, Settings.AppName);
+
+	/// <summary>
+	/// Gets the folder path where application logs are stored.
+	/// </summary>
+	/// <remarks>
+	/// Combines <see cref="ApplicationFolder"/> with <see cref="EngineSettings.LogDirectory"/>.
+	/// </remarks>
 	public string ApplicationLogFolder => Path.Combine(ApplicationFolder, Settings.LogDirectory);
+
+	/// <summary>
+	/// Gets the folder path where application save data is stored.
+	/// </summary>
+	/// <remarks>
+	/// Combines <see cref="ApplicationFolder"/> with <see cref="EngineSettings.SaveDirectory"/>.
+	/// </remarks>
 	public string ApplicationSaveFolder => Path.Combine(ApplicationFolder, Settings.SaveDirectory);
 
 	/// <summary>
@@ -62,7 +165,7 @@ public class Game : IDisposable
 	/// <param name="width">The desired window width in pixels. Must be greater than zero.</param>
 	/// <param name="height">The desired window height in pixels. Must be greater than zero.</param>
 	/// <remarks>
-	/// Updates <see cref="Settings.Window"/> and flags <see cref="_canApplyChanges"/> if a valid size change is detected.
+	/// Updates <see cref="EngineSettings.Window"/> and flags <see cref="_canApplyChanges"/> if a valid size change is detected.
 	/// </remarks>
 	public void ApplyWindowSizeChange(uint width, uint height)
 	{
@@ -148,16 +251,16 @@ public class Game : IDisposable
 		if (!_canApplyChanges)
 			return;
 
-		if (_window?.IsInvalid == true)
+		if (ToRenderer?.IsInvalid == true)
 		{
 			Input.Unload();
 
-			_window.Closed -= OnWindowClose;
-			_window.GainedFocus -= OnGainedFocus;
-			_window.LostFocus -= OnLostFocus;
+			ToRenderer.Closed -= OnWindowClose;
+			ToRenderer.GainedFocus -= OnGainedFocus;
+			ToRenderer.LostFocus -= OnLostFocus;
 
-			_window.Close();
-			_window.Dispose();
+			ToRenderer.Close();
+			ToRenderer.Dispose();
 		}
 
 		_videoMode = new SFVideoMode((uint)Settings.Window.X, (uint)Settings.Window.Y);
@@ -172,9 +275,9 @@ public class Game : IDisposable
 
 		try
 		{
-			_window = new SFRenderWindow(_videoMode, Settings.AppTitle, _styles, _context);
+			ToRenderer = new SFRenderWindow(_videoMode, Settings.AppTitle, _styles, _context);
 
-			if (_window.IsInvalid || !_window.IsOpen)
+			if (ToRenderer.IsInvalid || !ToRenderer.IsOpen)
 			{
 				throw new WindowCreationException(
 					"Failed to create SNAP window. Make sure your GPU supports OpenGl 3.3 or greater."
@@ -183,18 +286,18 @@ public class Game : IDisposable
 
 			_log.Log(LogLevel.Info, "Window successfully created.");
 
-			_window.SetIcon(_icon.Size.X, _icon.Size.Y, _icon.Pixels);
-			_window.SetVerticalSyncEnabled(Settings.VSync);
-			_window.SetMouseCursorVisible(Settings.Mouse);
-			_window.Closed += OnWindowClose;
-			_window.GainedFocus += OnGainedFocus;
-			_window.LostFocus += OnLostFocus;
+			ToRenderer.SetIcon(_icon.Size.X, _icon.Size.Y, _icon.Pixels);
+			ToRenderer.SetVerticalSyncEnabled(Settings.VSync);
+			ToRenderer.SetMouseCursorVisible(Settings.Mouse);
+			ToRenderer.Closed += OnWindowClose;
+			ToRenderer.GainedFocus += OnGainedFocus;
+			ToRenderer.LostFocus += OnLostFocus;
 
 			if (!Settings.FullScreen)
 			{
-				_window.Position = new SFVectI(
-					(int)(CurrentMonitor.Width - _window.Size.X) / 2,
-					(int)(CurrentMonitor.Height - _window.Size.Y) / 2
+				ToRenderer.Position = new SFVectI(
+					(int)(CurrentMonitor.Width - ToRenderer.Size.X) / 2,
+					(int)(CurrentMonitor.Height - ToRenderer.Size.Y) / 2
 				);
 			}
 
@@ -223,10 +326,10 @@ public class Game : IDisposable
 
 	private void OnWindowClose(object sender, EventArgs e)
 	{
-		if (!_window.IsOpen)
+		if (!ToRenderer.IsOpen)
 			return;
 
-		_window.Close();
+		ToRenderer.Close();
 	}
 
 	// Systems:
@@ -326,9 +429,9 @@ public class Game : IDisposable
 
 		try
 		{
-			_window = new SFRenderWindow(_videoMode, Settings.AppTitle, _styles, _context);
+			ToRenderer = new SFRenderWindow(_videoMode, Settings.AppTitle, _styles, _context);
 
-			if (_window.IsInvalid || !_window.IsOpen)
+			if (ToRenderer.IsInvalid || !ToRenderer.IsOpen)
 			{
 				throw new WindowCreationException(
 					"Failed to create SNAP window. Make sure your GPU supports OpenGl 3.3 or greater."
@@ -337,13 +440,13 @@ public class Game : IDisposable
 
 			_log.Log(LogLevel.Info, "Window successfully created.");
 
-			_window.SetIcon(_icon.Size.X, _icon.Size.Y, _icon.Pixels);
+			ToRenderer.SetIcon(_icon.Size.X, _icon.Size.Y, _icon.Pixels);
 
 			if (!Settings.FullScreen)
 			{
-				_window.Position = new SFVectI(
-					(int)(CurrentMonitor.Width - _window.Size.X) / 2,
-					(int)(CurrentMonitor.Height - _window.Size.Y) / 2
+				ToRenderer.Position = new SFVectI(
+					(int)(CurrentMonitor.Width - ToRenderer.Size.X) / 2,
+					(int)(CurrentMonitor.Height - ToRenderer.Size.Y) / 2
 				);
 			}
 		}
@@ -362,9 +465,9 @@ public class Game : IDisposable
 			throw new WindowCreationException("Unexpected error while creating SNAP window.", ex);
 		}
 
-		_window.Closed += (_, _) => _window.Close();
-		_window.GainedFocus += (_, _) => IsActive = true;
-		_window.LostFocus += (_, _) => IsActive = false;
+		ToRenderer.Closed += (_, _) => ToRenderer.Close();
+		ToRenderer.GainedFocus += (_, _) => IsActive = true;
+		ToRenderer.LostFocus += (_, _) => IsActive = false;
 
 		// Happens only when app crashes, make sure to report:
 		AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
@@ -379,10 +482,10 @@ public class Game : IDisposable
 		AppDomain.CurrentDomain.ProcessExit += (sender, args) => _log.Log(LogLevel.Info, "SNAP Stopped\n");
 
 		_log.Log(LogLevel.Info, $"Vsync been set to: {settings.VSync}.");
-		_window.SetVerticalSyncEnabled(settings.VSync);
+		ToRenderer.SetVerticalSyncEnabled(settings.VSync);
 
 		_log.Log(LogLevel.Info, $"Mouse visbility been set to: {settings.Mouse}.");
-		_window.SetMouseCursorVisible(settings.Mouse);
+		ToRenderer.SetMouseCursorVisible(settings.Mouse);
 
 		_log.Log(LogLevel.Info, "Initializing SNAP core services...");
 
@@ -437,17 +540,17 @@ public class Game : IDisposable
 	/// Closes the active game window and initiates application shutdown.  
 	/// </summary>
 	/// <remarks>
-	/// Safely terminates the current <see cref="_window"/> instance if it is open.  
+	/// Safely terminates the current <see cref="ToRenderer"/> instance if it is open.  
 	/// If the window is already closed or invalid, the call is ignored.  
 	/// This method does not immediately dispose engine systems; it simply signals the
 	/// end of the active rendering session.
 	/// </remarks>
 	public void Quit()
 	{
-		if (_window?.IsOpen != true)
+		if (ToRenderer?.IsOpen != true)
 			return;
 
-		_window.Close();
+		ToRenderer.Close();
 	}
 
 
@@ -484,7 +587,7 @@ public class Game : IDisposable
 	/// </remarks>
 	public void Run()
 	{
-		if (_window.IsInvalid)
+		if (ToRenderer.IsInvalid)
 			throw new InvalidOperationException("Window is invalid. Cannot start engine.");
 
 		_log.Log(LogLevel.Info, "Loading InputMap...");
@@ -512,17 +615,17 @@ public class Game : IDisposable
 			}
 		}
 
-		while (_window.IsOpen)
+		while (ToRenderer.IsOpen)
 		{
-			_window.DispatchEvents();
+			ToRenderer.DispatchEvents();
 			_clock.Update();
 			_coroutineManager.Update();
 
 			UpdateTitle();
 
-			_window.Clear(Settings.ClearColor);
+			ToRenderer.Clear(Settings.ClearColor);
 			_screenManager.Update();
-			_window.Display();
+			ToRenderer.Display();
 		}
 	}
 
@@ -546,7 +649,7 @@ public class Game : IDisposable
 			_assets.Clear();
 			_soundManager.Clear();
 			_screenManager.Clear();
-			_window?.Dispose();
+			ToRenderer?.Dispose();
 
 			_isDisposed = true;
 		}
@@ -583,7 +686,7 @@ public class Game : IDisposable
 			var tEntity = _screenManager.Screens.Sum(x => x.Entities.Count);
 			var aEntity = _screenManager.Screens.Sum(x => x.ActiveEntities.Count);
 
-			double BytesToMib(long bytes) => bytes / 1024.0 / 1024.0;
+			static double BytesToMib(long bytes) => bytes / 1024.0 / 1024.0;
 
 			sb.Append($"{Settings.AppTitle} | ");
 
@@ -611,7 +714,7 @@ public class Game : IDisposable
 			// // Sounds:
 			sb.Append($"Sound: Playing: {_soundManager.PlayCount}, Banks: {_soundManager.Count}");
 
-			_window.SetTitle(sb.ToString());
+			ToRenderer.SetTitle(sb.ToString());
 
 			_titleTimeout += 1.0f;
 		}
@@ -656,15 +759,14 @@ public class Game : IDisposable
 	{
 		float ratio = (float)wRatio / hRatio;
 
-		return SFVideoMode.FullscreenModes
+		return [.. SFVideoMode.FullscreenModes
 			.Where(mode =>
 			{
 				float actualRatio = (float)mode.Width / mode.Height;
 				return Math.Abs(actualRatio - ratio) < tolerance;
 			})
-			.Select(x => new Monitor((int)x.Width, (int)x.Height))
-			.ToList();
+			.Select(x => new Monitor((int)x.Width, (int)x.Height))];
 	}
 
-	internal SFRenderWindow ToRenderer => _window;
+	internal SFRenderWindow ToRenderer { get; private set; }
 }
