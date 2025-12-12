@@ -191,7 +191,7 @@ public struct Rect2 : IEquatable<Rect2>
 	public Rect2(in Vect2 position, in Vect2 size)
 		: this(position.X, position.Y, size.X, size.Y) { }
 
-	// <summary>
+	/// <summary>
 	/// Initializes a new instance of the <see cref="Rect2"/> struct from an <see cref="SFRectF"/>.
 	/// </summary>
 	/// <param name="rect">The source rectangle defined with floating-point values.</param>

@@ -3,25 +3,22 @@ namespace Snap.Engine.Coroutines.Routines.Compositions;
 /// <summary>
 /// Runs multiple <see cref="IEnumerator"/> routines concurrently and completes when all of them have finished.
 /// </summary>
-public class Concurrent : IEnumerator
+/// <remarks>
+/// Initializes a new instance of the <see cref="Concurrent"/> class.
+/// </remarks>
+/// <param name="routines">An array of IEnumerators to run concurrently.</param>
+/// <remarks>
+/// Null routines are ignored. Each routine is independently advanced each frame until all have completed.
+/// </remarks>
+public class Concurrent(params IEnumerator[] routines) : IEnumerator
 {
-	private readonly List<IEnumerator> _active;
+	private readonly List<IEnumerator> _active = [.. routines];
 
 	/// <summary>
 	/// Gets the current value of the enumerator.
 	/// Always returns <c>null</c> for <see cref="Concurrent"/>.
 	/// </summary>
 	public object Current => null;
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Concurrent"/> class.
-	/// </summary>
-	/// <param name="routines">An array of IEnumerators to run concurrently.</param>
-	/// <remarks>
-	/// Null routines are ignored. Each routine is independently advanced each frame until all have completed.
-	/// </remarks>
-	public Concurrent(params IEnumerator[] routines)
-		=> _active = new List<IEnumerator>(routines);
 
 	/// <summary>
 	/// Advances all active routines by one step.
