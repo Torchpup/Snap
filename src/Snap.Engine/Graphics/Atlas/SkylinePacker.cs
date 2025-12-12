@@ -20,18 +20,11 @@ namespace Snap.Engine.Graphics.Atlas;
 /// </remarks>
 public sealed class SkylinePacker
 {
-	private struct Node
+	internal class Node(int x, int y, int width)
 	{
-		public int X;
-		public int Y;
-		public int Width;
-
-		internal Node(int x, int y, int width)
-		{
-			X = x;
-			Y = y;
-			Width = width;
-		}
+		public int X = x;
+		public int Y = y;
+		public int Width = width;
 	}
 
 	private readonly int _pageWidth;
