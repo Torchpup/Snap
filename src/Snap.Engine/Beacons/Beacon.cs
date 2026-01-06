@@ -71,7 +71,7 @@ public sealed class BeaconManager
 		if (handler == null)
 			throw new ArgumentNullException(nameof(handler));
 
-		uint hash = HashHelpers.Hash32(topic);
+		uint hash = HashHelpers.Cache32(topic);
 		TopicEntry entry;
 		lock (_mapLock)
 		{
@@ -112,7 +112,7 @@ public sealed class BeaconManager
 		if (string.IsNullOrEmpty(topic) || handler == null) return;
 
 		TopicEntry entry;
-		uint hash = HashHelpers.Hash32(topic);
+		uint hash = HashHelpers.Cache32(topic);
 
 		lock (_mapLock)
 			if (!_topics.TryGetValue(hash, out entry)) return; // No such topic, nothing to do.
@@ -183,7 +183,7 @@ public sealed class BeaconManager
 			throw new ArgumentException("Topic must be a non-empty string", nameof(topic));
 
 		TopicEntry entry;
-		uint hash = HashHelpers.Hash32(topic);
+		uint hash = HashHelpers.Cache32(topic);
 
 		lock (_mapLock)
 		{

@@ -76,7 +76,7 @@ public sealed class SpriteFont : Font
 
 		var seq = _charList.IsEmpty()
 			? " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOP" +
-				"QRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}"
+				"QRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 			: _charList;
 
 		Texture = new SFTexture(bytes) { Smooth = _smoothing };
@@ -131,7 +131,7 @@ public sealed class SpriteFont : Font
 		bool isMagenta(uint x, uint y)
 		{
 			var px = img.GetPixel(x, y);
-			return px.R == topLeft.R && px.G == topLeft.G && px.B == topLeft.B && px.A == topLeft.A;
+			return px.R == topLeft.R && px.G == topLeft.G && px.B == topLeft.B;// && px.A == topLeft.A;
 		}
 
 		for (uint y = 0; y < h; y++)
@@ -186,8 +186,8 @@ public sealed class SpriteFont : Font
 		if (componetRects.Count < asciiSequence.Length - 1)
 		{
 			throw new InvalidOperationException(
-				$"LoadTransparentAtlas found {componetRects.Count} cells but expected {asciiSequence.Length}" +
-				$"Check that (a) boundground is magenta everywhere out of cells, (B) each border is solid border Color. (C) you passed incorrect asciiSequence"
+				$"LoadTransparentAtlas found {componetRects.Count} cells but expected {asciiSequence.Length} " +
+				$"Check that (a) boundground is everywhere out of cells, (B) each border is solid border Color. (C) you passed incorrect asciiSequence"
 			);
 		}
 
@@ -195,6 +195,14 @@ public sealed class SpriteFont : Font
 
 		for (int i = 0; i < asciiSequence.Length; i++)
 		{
+			if(i >= componetRects.Count)
+			{
+				throw new InvalidOperationException(
+					$"LoadTransparentAtlas found {componetRects.Count} cells but expected {asciiSequence.Length} " +
+					$"Check that (a) boundground is everywhere out of cells, (B) each border is solid border Color. (C) you passed incorrect asciiSequence"
+				);
+			}
+
 			var outer = componetRects[i];
 			int x0 = outer.Left, x1 = outer.Left + outer.Width - 1;
 			int y0 = outer.Top, y1 = outer.Top + outer.Height - 1;

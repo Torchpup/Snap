@@ -133,6 +133,8 @@ public sealed class Listview : RenderTarget
 		}
 	}
 
+	public int ScrollIndex => _scrollIndex;
+
 	/// <summary>
 	/// Gets or sets the globally selected index in the listview.
 	/// Automatically adjusts scroll position to keep selection in view.

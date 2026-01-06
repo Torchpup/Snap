@@ -61,42 +61,42 @@ public sealed class MapNeighbour
 	/// <summary>
 	/// Gets the ID of the neighbor to the north, or an empty string if none exists.
 	/// </summary>
-	public string North => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.North), out var v) ? v : string.Empty;
+	public string North => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.North), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the northeast, or an empty string if none exists.
 	/// </summary>
-	public string NorthEast => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.NorthEast), out var v) ? v : string.Empty;
+	public string NorthEast => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.NorthEast), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the east, or an empty string if none exists.
 	/// </summary>
-	public string East => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.East), out var v) ? v : string.Empty;
+	public string East => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.East), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the southeast, or an empty string if none exists.
 	/// </summary>
-	public string SouthEast => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.SouthEast), out var v) ? v : string.Empty;
+	public string SouthEast => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.SouthEast), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the south, or an empty string if none exists.
 	/// </summary>
-	public string South => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.South), out var v) ? v : string.Empty;
+	public string South => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.South), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the southwest, or an empty string if none exists.
 	/// </summary>
-	public string SouthWest => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.SouthWest), out var v) ? v : string.Empty;
+	public string SouthWest => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.SouthWest), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the west, or an empty string if none exists.
 	/// </summary>
-	public string West => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.West), out var v) ? v : string.Empty;
+	public string West => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.West), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the ID of the neighbor to the northwest, or an empty string if none exists.
 	/// </summary>
-	public string NorthWest => Neighbours.TryGetValue(HashHelpers.Hash32(MapNeighbourDirection.NorthWest), out var v) ? v : string.Empty;
+	public string NorthWest => Neighbours.TryGetValue(HashHelpers.Cache32(MapNeighbourDirection.NorthWest), out var v) ? v : string.Empty;
 
 	/// <summary>
 	/// Gets the read-only dictionary of all neighbor entries, keyed by direction hash.
@@ -131,7 +131,7 @@ public sealed class MapNeighbour
 			if (data.dir == MapNeighbourDirection.None || string.IsNullOrWhiteSpace(data.id))
 				continue;
 
-			result[HashHelpers.Hash32(data.dir)] = data.id;
+			result[HashHelpers.Cache32(data.dir)] = data.id;
 		}
 
 		return new MapNeighbour(result);

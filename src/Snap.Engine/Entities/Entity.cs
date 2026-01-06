@@ -854,8 +854,8 @@ public class Entity
 		var toRemove = _children.ToArray();
 		_children.Clear();
 
-		for (int i = toRemove.Length - 1; i >= 0; i--)
-			toRemove[i]._parent = null;
+		// for (int i = toRemove.Length - 1; i >= 0; i--)
+		// 	toRemove[i]._parent = null;
 
 		_screen.RemoveEntity(toRemove);
 	}

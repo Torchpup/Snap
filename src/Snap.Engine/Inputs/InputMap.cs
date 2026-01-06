@@ -541,7 +541,7 @@ public class InputMap
 	/// </remarks>
 	public bool IsActionPressed(string name)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 
 		if (!_actions.TryGetValue(hash, out var actions))
 			return false;
@@ -635,7 +635,7 @@ public class InputMap
 	/// </remarks>
 	public float GetActionForce(string name)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 
 		if (!_actions.TryGetValue(hash, out var actions))
 			return 0f;
@@ -693,7 +693,7 @@ public class InputMap
 	/// </remarks>
 	public bool IsActionJustPressed(string name)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 
 		if (!_actions.TryGetValue(hash, out var actions))
 			return false;
@@ -750,7 +750,7 @@ public class InputMap
 	/// </remarks>
 	public bool IsActionReleased(string name)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 
 		if (!_actions.TryGetValue(hash, out var actions))
 			return false;
@@ -806,7 +806,7 @@ public class InputMap
 	/// </remarks>
 	public void AddAction(string name, params object[] inputs)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 
 		if (!_actions.TryGetValue(hash, out var i))
 			_actions[hash] = new List<InputMapEntry>(GetInputs(inputs));

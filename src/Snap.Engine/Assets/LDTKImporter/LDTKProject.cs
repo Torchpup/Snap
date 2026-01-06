@@ -87,13 +87,13 @@ public sealed class LDTKProject : IAsset
 		{
 			var level = _levels[i];
 
-			_levelCache[HashHelpers.Hash32(level.Id)] = level;
+			_levelCache[HashHelpers.Cache32(level.Id)] = level;
 
 			for (int x = 0; x < level.Layers.Count; x++)
 			{
 				var layer = level.Layers[x];
 
-				_layerCache[HashHelpers.Hash32(layer.Id)] = layer;
+				_layerCache[HashHelpers.Cache32(layer.Id)] = layer;
 
 				if (layer.Type == MapLayerType.Entities)
 				{
@@ -102,7 +102,7 @@ public sealed class LDTKProject : IAsset
 					{
 						var entity = instances[z];
 
-						_entityCache[HashHelpers.Hash32(entity.Id)] = entity;
+						_entityCache[HashHelpers.Cache32(entity.Id)] = entity;
 					}
 				}
 			}
@@ -167,7 +167,7 @@ public sealed class LDTKProject : IAsset
 		if (_entityCache.Count == 0)
 			throw new Exception("You don't have any entities to search");
 
-		if (!_entityCache.TryGetValue(HashHelpers.Hash32(id), out var entity))
+		if (!_entityCache.TryGetValue(HashHelpers.Cache32(id), out var entity))
 			throw new Exception($"Unable to find a entity with the id '{id}'.");
 
 		return entity;
@@ -202,7 +202,7 @@ public sealed class LDTKProject : IAsset
 		if (_layerCache.Count == 0)
 			throw new Exception("You don't have any layers to search");
 
-		if (!_layerCache.TryGetValue(HashHelpers.Hash32(id), out var layer))
+		if (!_layerCache.TryGetValue(HashHelpers.Cache32(id), out var layer))
 			throw new Exception($"Unable to find a layer with the id '{id}'.");
 
 		return layer;
@@ -287,7 +287,7 @@ public sealed class LDTKProject : IAsset
 
 		if (string.IsNullOrWhiteSpace(id))
 			return null;
-		if (!_levelCache.TryGetValue(HashHelpers.Hash32(id), out var level))
+		if (!_levelCache.TryGetValue(HashHelpers.Cache32(id), out var level))
 			return null;
 
 		return level;

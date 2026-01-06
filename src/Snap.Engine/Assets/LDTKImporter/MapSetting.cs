@@ -19,6 +19,16 @@ public class MapSetting
 	/// <exception cref="InvalidCastException">Thrown if the stored value is not compatible with the requested type.</exception>
 	public T ValueAs<T>() => (T)Value;
 
+
+
+
+
+	public static bool Contains(Dictionary<uint, MapSetting> settings, string name)
+		=> settings.ContainsKey(HashHelpers.Cache32(name));
+
+
+
+
 	/// <summary>
 	/// Retrieves a boolean setting by name from a dictionary of typed map settings.
 	/// </summary>
@@ -34,12 +44,25 @@ public class MapSetting
 	/// </exception>
 	public static bool GetBoolSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not bool)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(bool)}'.");
 
 		return result.ValueAs<bool>();
+	}
+	public static bool TryGetBoolSetting(Dictionary<uint, MapSetting> settings, string name, out bool setting)
+	{
+		try
+		{
+			setting = GetBoolSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -53,12 +76,25 @@ public class MapSetting
 	/// </exception>
 	public static int GetIntSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not int)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(int)}'.");
 
 		return result.ValueAs<int>();
+	}
+	public static bool TryGetIntSetting(Dictionary<uint, MapSetting> settings, string name, out int setting)
+	{
+		try
+		{
+			setting = GetIntSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -72,12 +108,25 @@ public class MapSetting
 	/// </exception>
 	public static float GetFloatSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not float)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(float)}'.");
 
 		return result.ValueAs<float>();
+	}
+	public static bool TryGetFloatSetting(Dictionary<uint, MapSetting> settings, string name, out float setting)
+	{
+		try
+		{
+			setting = GetFloatSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -91,12 +140,25 @@ public class MapSetting
 	/// </exception>
 	public static Vect2 GetPointSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not Vect2)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(Vect2)}'.");
 
 		return result.ValueAs<Vect2>();
+	}
+	public static bool TryGetPointSetting(Dictionary<uint, MapSetting> settings, string name, out Vect2 setting)
+	{
+		try
+		{
+			setting = GetPointSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -110,12 +172,25 @@ public class MapSetting
 	/// </exception>
 	public static Color GetColorSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not Color)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(Color)}'.");
 
 		return result.ValueAs<Color>();
+	}
+	public static bool TryGetColorSetting(Dictionary<uint, MapSetting> settings, string name, out Color setting)
+	{
+		try
+		{
+			setting = GetColorSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -129,12 +204,25 @@ public class MapSetting
 	/// </exception>
 	public static string GetStringSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not string)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(string)}'.");
 
 		return result.ValueAs<string>();
+	}
+	public static bool TryGetStringSetting(Dictionary<uint, MapSetting> settings, string name, out string setting)
+	{
+		try
+		{
+			setting = GetStringSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -148,12 +236,25 @@ public class MapSetting
 	/// </exception>
 	public static string GetFilePathSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not string)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(string)}'.");
 
 		return result.ValueAs<string>();
+	}
+	public static bool TryGetFilePathSetting(Dictionary<uint, MapSetting> settings, string name, out string setting)
+	{
+		try
+		{
+			setting = GetFilePathSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -167,12 +268,25 @@ public class MapSetting
 	/// </exception>
 	public static MapTile GetTileSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not MapTile)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(MapTile)}'.");
 
 		return result.ValueAs<MapTile>();
+	}
+	public static bool TryGetTileSetting(Dictionary<uint, MapSetting> settings, string name, out MapTile setting)
+	{
+		try
+		{
+			setting = GetTileSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -187,12 +301,25 @@ public class MapSetting
 	/// </exception>
 	public static MapEntityRef GetEntityRefSetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not MapEntityRef)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(MapEntityRef)}'.");
 
 		return result.ValueAs<MapEntityRef>();
+	}
+	public static bool TryGetEntityRefSetting(Dictionary<uint, MapSetting> settings, string name, out MapEntityRef setting)
+	{
+		try
+		{
+			setting = GetEntityRefSetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -207,14 +334,26 @@ public class MapSetting
 	/// </exception>
 	public static TEnum GetEnumSetting<TEnum>(Dictionary<uint, MapSetting> settings, string name) where TEnum : Enum
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not string)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(TEnum)}'.");
 
 		return (TEnum)Enum.Parse(typeof(TEnum), result.ValueAs<string>(), true);
 	}
-
+	public static bool TryGetEnumSetting<TEnum>(Dictionary<uint, MapSetting> settings, string name, out TEnum setting) where TEnum : Enum
+	{
+		try
+		{
+			setting = GetEnumSetting<TEnum>(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
+	}
 
 
 
@@ -233,13 +372,28 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<bool> GetBoolArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<bool>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<bool>)}'.");
 
 		return result.ValueAs<List<bool>>();
 	}
+	public static bool TryGetBoolArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<bool> setting)
+	{
+		try
+		{
+			setting = GetBoolArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
+	}
+
+
 
 	/// <summary>
 	/// Retrieves a list of integer values from a setting field.
@@ -252,12 +406,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<int> GetIntArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<int>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<int>)}'.");
 
 		return result.ValueAs<List<int>>();
+	}
+	public static bool TryGetIntArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<int> setting)
+	{
+		try
+		{
+			setting = GetIntArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -271,12 +438,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<float> GetFloatArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<float>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<float>)}'.");
 
 		return result.ValueAs<List<float>>();
+	}
+	public static bool TryGetFloatArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<float> setting)
+	{
+		try
+		{
+			setting = GetFloatArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -290,12 +470,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<Vect2> GetPointArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<Vect2>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<Vect2>)}'.");
 
 		return result.ValueAs<List<Vect2>>();
+	}
+	public static bool TryGetPointArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<Vect2> setting)
+	{
+		try
+		{
+			setting = GetPointArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -309,12 +502,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<Color> GetColorArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<Color>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<Color>)}'.");
 
 		return result.ValueAs<List<Color>>();
+	}
+	public static bool TryGetColorArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<Color> setting)
+	{
+		try
+		{
+			setting = GetColorArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -328,12 +534,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<string> GetStringArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<string>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<string>)}'.");
 
 		return result.ValueAs<List<string>>();
+	}
+	public static bool TryGetStringArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<string> setting)
+	{
+		try
+		{
+			setting = GetStringArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -347,12 +566,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<string> GetFilePathArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<string>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<string>)}'.");
 
 		return result.ValueAs<List<string>>();
+	}
+	public static bool TryGetFilePathArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<string> setting)
+	{
+		try
+		{
+			setting = GetFilePathArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -366,12 +598,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<MapTile> GetTileArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<MapTile>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<MapTile>)}'.");
 
 		return result.ValueAs<List<MapTile>>();
+	}
+	public static bool TryGetTileArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<MapTile> setting)
+	{
+		try
+		{
+			setting = GetTileArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -385,12 +630,25 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<MapEntityRef> GetEntityRefArraySetting(Dictionary<uint, MapSetting> settings, string name)
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<MapEntityRef>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<MapEntityRef>)}'.");
 
 		return result.ValueAs<List<MapEntityRef>>();
+	}
+	public static bool TryGetEntityRefArraySetting(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<MapEntityRef> setting)
+	{
+		try
+		{
+			setting = GetEntityRefArraySetting(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -405,7 +663,7 @@ public class MapSetting
 	/// </exception>
 	public static IReadOnlyList<TEnum> GetEnumArraySetting<TEnum>(Dictionary<uint, MapSetting> settings, string name) where TEnum : Enum
 	{
-		if (!settings.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!settings.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new Exception($"Unable to find setting with the name '{name}'.");
 		if (result.Value is not List<string>)
 			throw new Exception($"This setting '{name}' isn't '{result.Value.GetType()}', it is  '{typeof(List<TEnum>)}'.");
@@ -423,5 +681,18 @@ public class MapSetting
 		}
 
 		return enumResult;
+	}
+	public static bool TryGetEnumArraySetting<TEnum>(Dictionary<uint, MapSetting> settings, string name, out IReadOnlyList<TEnum> setting) where TEnum : Enum
+	{
+		try
+		{
+			setting = GetEnumArraySetting<TEnum>(settings, name);
+			return true;
+		}
+		catch
+		{
+			setting = default;
+			return false;
+		}
 	}
 }

@@ -99,7 +99,7 @@ public static class JsonHelpers
 			if (type.IsEmpty())
 				throw new Exception($"Map setting has a null type from '{name}'.");
 
-			result[HashHelpers.Hash32(name)] = type switch
+			result[HashHelpers.Cache32(name)] = type switch
 			{
 				// Single items:
 				var x when x.StartsWith("Int") =>

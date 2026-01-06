@@ -13,7 +13,7 @@ public class RenderTarget(params Entity[] entities) : Panel(entities)
 	private const int MaxDrawCalls = 256;
 	private const int MaxVerticies = 6;
 
-	private readonly Dictionary<uint, List<DrawCommand>> _drawCommands = new(8);
+	private readonly Dictionary<uint, List<DrawCommand>> _drawCommands = new(32);
 	private int _vertexBufferSize, _batches;
 	private SFRenderTexture _rendTexture;
 	private SFVertexBuffer _vertexBuffer;
@@ -164,7 +164,7 @@ public class RenderTarget(params Entity[] entities) : Panel(entities)
 
 	internal void Flush(int vertexCount, SFVertex[] vertices, SFTexture texture)
 	{
-		if (vertexCount == 0 || texture == null)
+		if (vertexCount == 0 || texture == null || texture.IsInvalid)
 			return;
 
 		// ZERO OUT any leftover verts so they don't draw
@@ -232,7 +232,7 @@ public class RenderTarget(params Entity[] entities) : Panel(entities)
 
 		_rendTexture.Display();
 
-		Renderer.DrawBypassAtlas(_texture, Position, Color, Layer);
+		Renderer.DrawBypassAtlas(_texture, Position, _color, Layer);
 
 		IsRendering = false;
 
@@ -240,6 +240,21 @@ public class RenderTarget(params Entity[] entities) : Panel(entities)
 		// 	BE.Renderer.DrawRectangleOutline(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height, 1f, BoxColor.AllShades.Teal);
 		base.OnUpdate();
 	}
+
+
+	private Color _color = Color.White;
+
+	// public new Color Color
+	// {
+	// 	get => _color;
+	// 	set
+	// 	{
+	// 		_color = value;
+	// 	}
+	// }
+
+
+	public void OverrideTextureColor(Color color) => _color = color;
 
 
 	/// <summary>

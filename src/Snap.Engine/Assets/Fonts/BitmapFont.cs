@@ -147,7 +147,7 @@ public sealed class BitmapFont : Font
 			{
 				var data = ParseKeyValuePairs(line);
 				if (data.TryGetValue("id", out var idStr) && int.TryParse(idStr, out var pageId)
-				 && data.TryGetValue("file", out var fileNameRaw))
+				&& data.TryGetValue("file", out var fileNameRaw))
 				{
 					var fileName = fileNameRaw.Trim('"');
 					var imgBytes = pageLoader(fileName);
@@ -194,8 +194,8 @@ public sealed class BitmapFont : Font
 			{
 				var data = ParseKeyValuePairs(line);
 				if (data.TryGetValue("first", out var fStr) && uint.TryParse(fStr, out var first)
-				 && data.TryGetValue("second", out var sStr) && uint.TryParse(sStr, out var second)
-				 && data.TryGetValue("amount", out var amtStr) && int.TryParse(amtStr, out var amount))
+				&& data.TryGetValue("second", out var sStr) && uint.TryParse(sStr, out var second)
+				&& data.TryGetValue("amount", out var amtStr) && int.TryParse(amtStr, out var amount))
 				{
 					KerningLookup[(first, second)] = amount;
 				}

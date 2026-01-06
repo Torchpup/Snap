@@ -94,7 +94,7 @@ public sealed class Spritesheet : IAsset
 				);
 			}
 
-			_spritesheets[HashHelpers.Hash32(name)] =
+			_spritesheets[HashHelpers.Cache32(name)] =
 				new SpritesheetEntry(rectBounds, rectPatch, vectPivot);
 		}
 
@@ -143,7 +143,7 @@ public sealed class Spritesheet : IAsset
 	{
 		if (name.IsEmpty())
 			throw new ArgumentNullException(nameof(name), "Sprite name must not be null or empty.");
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new KeyNotFoundException($"No spritesheet entry found for name '{name}'.");
 		if (result.Bounds.IsEmpty)
 			throw new InvalidOperationException($"Bounds for spritesheet '{name}' has not been set.");
@@ -159,7 +159,7 @@ public sealed class Spritesheet : IAsset
 	/// <see langword="true"/> if the sprite exists; otherwise, <see langword="false"/>.
 	/// </returns>
 	public bool Contains(string name) =>
-		_spritesheets.TryGetValue(HashHelpers.Hash32(name), out _);
+		_spritesheets.TryGetValue(HashHelpers.Cache32(name), out _);
 
 	/// <summary>
 	/// Attempts to retrieve the bounding rectangle of a sprite by name.
@@ -175,7 +175,7 @@ public sealed class Spritesheet : IAsset
 
 		if (name.IsEmpty())
 			return false;
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			return false;
 		if (result.Bounds.IsEmpty)
 			return false;
@@ -203,7 +203,7 @@ public sealed class Spritesheet : IAsset
 	{
 		if (name.IsEmpty())
 			throw new ArgumentNullException(nameof(name), "Sprite name must not be null or empty.");
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new KeyNotFoundException($"No spritesheet entry found for name '{name}'.");
 		if (result.Patch.IsEmpty)
 			throw new Exception($"9-slice patch for '{name}' has not been defined.");
@@ -225,7 +225,7 @@ public sealed class Spritesheet : IAsset
 
 		if (name.IsEmpty())
 			return false;
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			return false;
 		if (result.Patch.IsEmpty)
 			return false;
@@ -253,7 +253,7 @@ public sealed class Spritesheet : IAsset
 	{
 		if (name.IsEmpty())
 			throw new ArgumentNullException(nameof(name), "Sprite name must not be null or empty.");
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new KeyNotFoundException($"No spritesheet entry found for name '{name}'.");
 		if (result.Pivot.IsZero)
 			throw new Exception($"Pivot point for '{name}' has not been set.");
@@ -275,7 +275,7 @@ public sealed class Spritesheet : IAsset
 
 		if (name.IsEmpty())
 			return false;
-		if (!_spritesheets.TryGetValue(HashHelpers.Hash32(name), out var result))
+		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			return false;
 		if (result.Pivot.IsZero)
 			return false;

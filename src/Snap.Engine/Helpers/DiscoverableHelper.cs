@@ -1,3 +1,5 @@
+using System.Threading.Tasks.Dataflow;
+
 namespace Snap.Engine.Helpers;
 
 /// <summary>
@@ -104,6 +106,73 @@ public static class DiscoverableHelper
 		=> FindSingleByName<T>(name.ToEnumString());
 
 	/// <summary>
+	/// Attempts to find exactly one discoverable type within the specified category.
+	/// </summary>
+	/// <typeparam name="T">
+	/// The base type or interface used to filter discoverable results. Only types
+	/// assignable to <typeparamref name="T"/> will be considered.
+	/// </typeparam>
+	/// <param name="category">
+	/// The category identifier to match against discoverable metadata. Comparison is
+	/// case-insensitive.
+	/// </param>
+	/// <returns>
+	/// The single matching type if exactly one discoverable type belongs to the
+	/// specified category; otherwise <c>null</c>.
+	/// </returns>
+	public static Type FindSingleByCategory<T>(string category)
+	{
+		var matches = FindManyByCategory<T>(category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+	/// <summary>
+	/// Attempts to find exactly one discoverable type within the specified enum-based category.
+	/// </summary>
+	/// <typeparam name="T">
+	/// The base type or interface used to filter discoverable results. Only types
+	/// assignable to <typeparamref name="T"/> will be considered.
+	/// </typeparam>
+	/// <param name="category">
+	/// An <see cref="Enum"/> value whose string representation is used as the category
+	/// identifier when matching discoverable metadata.
+	/// </param>
+	/// <returns>
+	/// The single matching type if exactly one discoverable type belongs to the
+	/// specified category; otherwise <c>null</c>.
+	/// </returns>
+	public static Type FindSingleByCategory<T>(Enum category)
+	{
+		var matches = FindManyByCategory<T>(category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+
+	public static Type FindSingleByNameAndCategory<T>(string name, Enum category)
+	{
+		var matches = FindManyByNameAndCategory<T>(name, category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+	public static Type FindSingleByNameAndCategory<T>(Enum name, string category)
+	{
+		var matches = FindManyByNameAndCategory<T>(name, category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+	public static Type FindSingleByNameAndCategory<T>(Enum name, Enum category)
+	{
+		var matches = FindManyByNameAndCategory<T>(name, category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+	public static Type FindSingleByNameAndCategory<T>(string name, string category)
+	{
+		var matches = FindManyByNameAndCategory<T>(name, category);
+		return matches.Count == 1 ? matches[0] : null;
+	}
+
+	/// <summary>
 	/// Retrieves all discoverable types matching the specified internal name.
 	/// </summary>
 	public static IReadOnlyList<Type> FindManyByName<T>(string name) =>
@@ -159,6 +228,18 @@ public static class DiscoverableHelper
 	/// </summary>
 	public static IReadOnlyList<Type> FindManyByNameAndCategory<T>(Enum name, Enum category) =>
 		FindManyByNameAndCategory<T>(name.ToEnumString(), category.ToEnumString());
+
+	/// <summary>
+	/// Enum overload for FindManyByNameAndCategory; uses the enum's string representations.
+	/// </summary>
+	public static IReadOnlyList<Type> FindManyByNameAndCategory<T>(string name, Enum category) =>
+		FindManyByNameAndCategory<T>(name, category.ToEnumString());
+
+	/// <summary>
+	/// Enum overload for FindManyByNameAndCategory; uses the enum's string representations.
+	/// </summary>
+	public static IReadOnlyList<Type> FindManyByNameAndCategory<T>(Enum name, string category) =>
+		FindManyByNameAndCategory<T>(name.ToEnumString(), category);
 
 	/// <summary>
 	/// Enum overload for FindManyByCategory; uses the enum's string representation.

@@ -335,7 +335,7 @@ public struct Color : IEquatable<Color>
 		(byte)Math.Clamp(a.B - b, 0f, 255f),
 		(byte)Math.Clamp(a.A - b, 0f, 255f)
 	);
-	
+
 	/// <summary>
 	/// Subtracts each component of the color from a float value, clamping the result to the valid range (0-255).
 	/// </summary>
@@ -430,6 +430,38 @@ public struct Color : IEquatable<Color>
 			(byte)((a.A + b.A) / 2)
 		);
 	}
+	#endregion
+
+
+	#region WithAlpha
+	/// <summary>
+	/// Returns a new <see cref="Color"/> with the same RGB values as this color,
+	/// but with the alpha channel replaced by the specified value.
+	/// </summary>
+	/// <param name="alpha">
+	/// The new alpha value, expressed as a normalized float in the range 0.0–1.0.
+	/// Values outside this range are clamped.
+	/// </param>
+	/// <returns>
+	/// A new <see cref="Color"/> whose alpha component is set to <paramref name="alpha"/>.
+	/// </returns>
+	public readonly Color WithAlpha(float alpha) => WithAlpha(this, alpha);
+
+	/// <summary>
+	/// Creates a new <see cref="Color"/> using the RGB components of the given color,
+	/// but with the alpha channel replaced by the specified value.
+	/// </summary>
+	/// <param name="color">The source color whose RGB values will be preserved.</param>
+	/// <param name="alpha">
+	/// The new alpha value, expressed as a normalized float in the range 0.0–1.0.
+	/// Values outside this range are clamped.
+	/// </param>
+	/// <returns>
+	/// A new <see cref="Color"/> with the same RGB values as <paramref name="color"/>,
+	/// but with its alpha component set to <paramref name="alpha"/>.
+	/// </returns>
+	public  static Color WithAlpha(Color color, float alpha) =>
+		new(color.R, color.B, color.G, (byte)Math.Clamp(alpha * 255f, 0f, 255f));
 	#endregion
 
 

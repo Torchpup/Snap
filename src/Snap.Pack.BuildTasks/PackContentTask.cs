@@ -1,4 +1,6 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 using Snap.Pack.Core;

@@ -257,7 +257,7 @@ public sealed class AnimatedSprite : Entity
 
 		var clampSpeed = MathF.Max(MinSpeed, speed);
 		var anim = new Animation(name, texture, rects, clampSpeed, looped);
-		var key = HashHelpers.Hash32(name);
+		var key = HashHelpers.Cache32(name);
 
 		_animations[key] = anim;
 		return this;
@@ -330,7 +330,7 @@ public sealed class AnimatedSprite : Entity
 	/// <exception cref="KeyNotFoundException">Thrown if animation with the given name does not exist.</exception>
 	public AnimatedSprite Play(string name, bool repeat, bool reset)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 		if (!_animations.TryGetValue(hash, out var anim))
 			throw new KeyNotFoundException($"Unable to find animation '{name}'.");
 

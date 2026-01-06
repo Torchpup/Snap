@@ -150,7 +150,7 @@ public sealed class AssetManager
 	/// <exception cref="InvalidOperationException">Thrown if the asset key already exists.</exception>
 	public void Add(string name, IAsset asset)
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 		if (_assets.ContainsKey(hash))
 			throw new InvalidOperationException($"An asset with the name '{name}' already exists.");
 
@@ -168,7 +168,7 @@ public sealed class AssetManager
 	/// </summary>
 	/// <param name="name">The string identifier of the asset to remove.</param>
 	public void Remove(string name) =>
-		InternalRemove(HashHelpers.Hash32(name), true);
+		InternalRemove(HashHelpers.Cache32(name), true);
 
 	/// <summary>
 	/// Retrieves and lazily loads an asset using an enum key.
@@ -188,7 +188,7 @@ public sealed class AssetManager
 	/// <exception cref="KeyNotFoundException">Thrown if no asset matches the name.</exception>
 	public T Get<T>(string name) where T : IAsset
 	{
-		var hash = HashHelpers.Hash32(name);
+		var hash = HashHelpers.Cache32(name);
 		if (!_assets.TryGetValue(hash, out var entry))
 			throw new KeyNotFoundException($"No asset found for '{name}'.");
 
