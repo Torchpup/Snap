@@ -20,15 +20,12 @@ public static class QuadBuilder
 		TextureEffects effects,
 		SFTexture texture = null)
 	{
-		// Validate
 		if (output == null || output.Length < 6)
 			throw new ArgumentException("Output array must have length 6", nameof(output));
 
-		// Compute pivot that accounts for both origin and scale exactly once
 		float pivotX = origin.X * dstRect.Width * scale.X;
 		float pivotY = origin.Y * dstRect.Height * scale.Y;
 
-		// Build "local" corner positions already multiplied by scale
 		Span<Vect2> localPos = stackalloc Vect2[4];
 		localPos[0] = new Vect2(-pivotX, -pivotY);
 		localPos[1] = new Vect2(dstRect.Width * scale.X - pivotX, -pivotY);
@@ -38,7 +35,6 @@ public static class QuadBuilder
 		float cos = MathF.Cos(rotation);
 		float sin = MathF.Sin(rotation);
 
-		// Rotate each corner and translate by (dstRect.X, dstRect.Y) + pivot
 		for (int i = 0; i < 4; i++)
 		{
 			float x = localPos[i].X;
@@ -50,7 +46,6 @@ public static class QuadBuilder
 			);
 		}
 
-		// Texture coordinates (UVs)
 		float u1 = srcRect.Left;
 		float v1 = srcRect.Top;
 		float u2 = srcRect.Right;
@@ -61,7 +56,6 @@ public static class QuadBuilder
 		if (effects.HasFlag(TextureEffects.FlipVertical))
 			(v1, v2) = (v2, v1);
 
-		// Apply half-texel offset if requested and texture provided
 		if (texture != null && EngineSettings.Instance?.HalfTexelOffset == true)
 		{
 			float texelOffsetX = TexelOffset / texture.Size.X;
@@ -83,7 +77,6 @@ public static class QuadBuilder
 		output[5] = new SFVertex(new SFVectF(localPos[3].X, localPos[3].Y), color, new SFVectF(u1, v2));
 	}
 
-	// Optional: Simpler overloads for common cases
 	public static void BuildQuad(
 		SFVertex[] output,
 		Rect2 dstRect,

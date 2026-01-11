@@ -173,9 +173,30 @@ public sealed class Renderer
 			_drawCommands[texHandle] = list;
 		}
 
-		list.Add(new DrawCommand(tex, quad, depth, _seqCounter++));
-	}
+		// list.Add(new DrawCommand(tex, quad, depth, _seqCounter++));
+		var cmd = new DrawCommand(tex, quad, depth, _seqCounter++);
 
+		InsertSorted(list, cmd);
+	}
+	private static void InsertSorted(List<DrawCommand> list, DrawCommand cmd)
+	{
+		// Binary search for insertion point
+		int index = list.BinarySearch(cmd, DrawCommandComparer.Instance);
+		if (index < 0) index = ~index; // Bitwise complement gives insertion point
+		list.Insert(index, cmd);
+	}
+	private class DrawCommandComparer : IComparer<DrawCommand>
+	{
+		public static readonly DrawCommandComparer Instance = new();
+
+		public int Compare(DrawCommand x, DrawCommand y)
+		{
+			int depthCompare = x.Depth.CompareTo(y.Depth);
+			if (depthCompare != 0) return depthCompare;
+
+			return x.Sequence.CompareTo(y.Sequence);
+		}
+	}
 
 
 	/// <summary>
@@ -802,10 +823,12 @@ public sealed class Renderer
 		var index = 0;
 		SFTexture currentTexture = null;
 
+		// var allCommands = _drawCommands.Values
+		// 	.SelectMany(list => list)
+		// 	.OrderBy(cmd => cmd.Depth)
+		// 	.ThenBy(cmd => cmd.Sequence);
 		var allCommands = _drawCommands.Values
-			.SelectMany(list => list)
-			.OrderBy(cmd => cmd.Depth)
-			.ThenBy(cmd => cmd.Sequence);
+			.SelectMany(list => list);
 
 		foreach (ref readonly var cmd in CollectionsMarshal.AsSpan(allCommands.ToList()))
 		{
