@@ -41,10 +41,20 @@ public static class SoundInstancePool
 	private static readonly object Lock = new();
 	private static uint s_nextInstanceId = 1;
 
-	/// <summary>Gets the number of sound instances currently active and playing.</summary>
+	/// <summary>
+	/// Gets the number of sound instances currently active and playing.
+	/// </summary>
+	/// <value>
+	/// The total count of active sound instances.
+	/// </value>
 	public static int ActiveInstances => _activeInstances.Count;
 
-	/// <summary>Gets the number of sound instances currently available in the pool for reuse.</summary>
+	/// <summary>
+	/// Gets the number of sound instances currently available in the pool for reuse.
+	/// </summary>
+	/// <value>
+	/// The total count of available sound instances in the pool.
+	/// </value>
 	public static int AvailbleInstances => _availbleInstances.Count;
 
 	/// <summary>

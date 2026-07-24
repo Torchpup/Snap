@@ -48,6 +48,18 @@ internal readonly struct DrawCommand
 /// </remarks>
 public sealed class Renderer
 {
+	// Fix: 1 Red-Flag: InsertSord does List.Insert - O(n2) Total => Saves ~0.8ms
+	// Fix: 2 Red-Flag: #2 I sort twice
+	// Fix: 3 Red-Flag: Quad Arrays built eagerly, than copied
+	//
+	// ===========================================================================
+	//
+	// After "Red-Flag" Fixes, ADD SIMD:
+	//
+	// Fix: Add SIMD Support for the renderer, should get an 70% increase
+	// from the red-flags fixes alone. Also, defer quad builder to End(), 
+	// architecture ready supports SIMD.
+
 	private const int MaxVerticies = 6;
 	// private const float TexelOffset = 0.05f;
 
@@ -58,19 +70,20 @@ public sealed class Renderer
 	private static long _seqCounter = 0;
 	private int _vertexBufferSize, _batches;
 	private Camera _camera;
-	// Add these fields at the top of the class
 	private int _currentCameraId = 0;
 	private int _nextCameraId = 1;
-	private readonly Dictionary<Camera, int> _cameraIdMap = new();
-	private readonly Dictionary<int, Camera> _cameraById = new();
+	private readonly Dictionary<Camera, int> _cameraIdMap = [];
+	private readonly Dictionary<int, Camera> _cameraById = [];
 	private readonly List<SFVertex[]> _rentedQuads = new(1024);
-	private static readonly ObjectPool<SFVertex[]> QuadPool =
-		new(() => new SFVertex[6], quad =>
+	private readonly List<DrawCommand> _tempCommandList = new(1024);
+	private static readonly ObjectPool<SFVertex[]> QuadPool = new(() =>
+		new SFVertex[6], quad =>
 		{
 			// Clear the array for reuse
 			for (int i = 0; i < 6; i++)
 				quad[i] = default;
-		});
+		}
+	);
 
 	/// <summary>
 	/// Gets the number of individual draw calls issued during the current frame.
@@ -252,12 +265,6 @@ public sealed class Renderer
 	/// The draw depth (z-order) of the sprite.  
 	/// Lower values are rendered first; higher values appear on top.
 	/// </param>
-	/// <remarks>
-	/// This method delegates to <c>EngineDraw</c>, which performs the actual batched rendering.  
-	/// It supports atlas packing by allowing partial texture regions via <paramref name="srcRect"/>.  
-	/// The combination of <paramref name="origin"/>, <paramref name="scale"/>, and <paramref name="rotation"/> 
-	/// provides full transformation control for sprite rendering.
-	/// </remarks>
 	public void Draw(Texture texture, Rect2 dstRect, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDraw(texture, dstRect, srcRect, color, origin, scale, rotation, effects, depth);
@@ -296,10 +303,6 @@ public sealed class Renderer
 	/// The draw depth (z-order) of the sprite.  
 	/// Lower values are rendered first; higher values appear on top.
 	/// </param>
-	/// <remarks>
-	/// This overload is a convenience method that uses the full <see cref="Texture.Bounds"/> as the source rectangle.  
-	/// It delegates to <c>EngineDraw</c> with the provided destination rectangle and transformation parameters.
-	/// </remarks>
 	public void Draw(Texture texture, Rect2 rect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDraw(texture, rect, texture.Bounds, color, origin, scale, rotation, effects, depth);
@@ -343,11 +346,6 @@ public sealed class Renderer
 	/// The draw depth (z-order) of the sprite.  
 	/// Lower values are rendered first; higher values appear on top.
 	/// </param>
-	/// <remarks>
-	/// This overload is a convenience method that constructs a destination rectangle from the given
-	/// <paramref name="position"/> and the size of <paramref name="srcRect"/>.  
-	/// It delegates to <c>EngineDraw</c> with the calculated destination rectangle and provided parameters.
-	/// </remarks>
 	public void Draw(Texture texture, Vect2 position, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDraw(texture, new(position, srcRect.Size), srcRect, color, origin, scale, rotation, effects, depth);
@@ -376,11 +374,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload is a convenience method that constructs a destination rectangle from the given
-	/// <paramref name="position"/> and the size of <paramref name="srcRect"/>.  
-	/// It delegates to <c>EngineDraw</c> with default transformation parameters (no origin, scale, or rotation).
-	/// </remarks>
 	public void Draw(Texture texture, Vect2 position, Rect2 srcRect, Color color, int depth = 0) =>
 		EngineDraw(texture, new Rect2(position, srcRect.Size), srcRect, color, depth: depth);
 
@@ -405,11 +398,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload is the simplest form of <c>Draw</c>.  
-	/// It constructs a destination rectangle from the given <paramref name="position"/> and the full texture size,  
-	/// then delegates to <c>EngineDraw</c> with default transformation parameters (no origin, scale, or rotation).
-	/// </remarks>
 	public void Draw(Texture texture, Vect2 position, Color color, int depth = 0) =>
 		EngineDraw(texture, new Rect2(position, texture.Size), texture.Bounds, color, depth: depth);
 
@@ -435,11 +423,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This method delegates to <c>EngineDrawText</c>, which performs the actual batched text rendering.  
-	/// It supports layering via <paramref name="depth"/> and applies the specified <paramref name="color"/> tint.  
-	/// The <paramref name="font"/> determines glyph metrics, spacing, and rendering style.
-	/// </remarks>
 	public void DrawText(Font font, string text, Vect2 position, Color color, int depth = 0)
 		=> EngineDrawText(font, text, position, color, depth);
 
@@ -482,11 +465,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// Unlike <see cref="Renderer.Draw(Texture,Rect2,Rect2,Color,Vect2?,Vect2?,float,TextureEffects,int)"/>,  
-	/// this method bypasses the atlas packing system and draws the texture directly.  
-	/// It is useful for cases where textures are not part of an atlas or when direct rendering is required.
-	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 dstRect, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, dstRect, srcRect, color, origin, scale, rotation, effects, depth);
@@ -532,11 +510,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload constructs a destination rectangle from the given <paramref name="position"/> and the full texture size,  
-	/// then delegates to <c>EngineDrawBypassAtlas</c> with the provided source rectangle and transformation parameters.  
-	/// Unlike the standard <c>Draw</c> methods, this bypasses atlas packing and renders the texture directly.
-	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Vect2 position, Rect2 srcRect, Color color, Vect2? origin = null,
 		Vect2? scale = null, float rotation = 0f, TextureEffects effects = TextureEffects.None, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, new Rect2(position, texture.Size), srcRect, color, origin, scale, rotation, effects, depth);
@@ -562,11 +535,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload is a convenience method that uses the full <see cref="Texture.Bounds"/> as the source rectangle.  
-	/// It delegates to <c>EngineDrawBypassAtlas</c> with the provided destination rectangle and default transformation parameters.  
-	/// Unlike the standard <c>Draw</c> methods, this bypasses atlas packing and renders the texture directly.
-	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 rect, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, rect, texture.Bounds, color, depth: depth);
 
@@ -591,11 +559,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload constructs a destination rectangle from the given <paramref name="position"/> and the full texture size,  
-	/// then delegates to <c>EngineDrawBypassAtlas</c> with the full <see cref="Texture.Bounds"/> as the source rectangle.  
-	/// Unlike the standard <c>Draw</c> methods, this bypasses atlas packing and renders the texture directly.
-	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Vect2 position, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, new Rect2(position, texture.Size), texture.Bounds, color, depth: depth);
 
@@ -623,11 +586,6 @@ public sealed class Renderer
 	/// Lower values are rendered first; higher values appear on top.  
 	/// Defaults to 0.
 	/// </param>
-	/// <remarks>
-	/// This overload delegates directly to <c>EngineDrawBypassAtlas</c> with the provided destination and source rectangles.  
-	/// Unlike the standard <c>Draw</c> methods, this bypasses atlas packing and renders the texture directly.  
-	/// It is useful for cases where textures are not part of an atlas or when direct rendering is required.
-	/// </remarks>
 	public void DrawBypassAtlas(Texture texture, Rect2 dst, Rect2 src, Color color, int depth = 0) =>
 		EngineDrawBypassAtlas(texture, dst, src, color, depth: depth);
 
@@ -781,8 +739,6 @@ public sealed class Renderer
 	}
 
 
-	private readonly List<DrawCommand> _tempCommandList = new(1024);
-
 	[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 	internal void End() //  Hot Path
 	{
@@ -890,7 +846,7 @@ public sealed class Renderer
 		_vertexBufferSize = newSize;
 	}
 
-	internal void Flush(int vertexCount, SFVertex[] vertices, SFTexture texture)
+	private void Flush(int vertexCount, SFVertex[] vertices, SFTexture texture)
 	{
 		if (vertexCount == 0 || texture == null || texture.IsInvalid)
 			return;

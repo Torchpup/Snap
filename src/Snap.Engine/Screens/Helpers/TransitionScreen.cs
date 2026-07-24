@@ -5,8 +5,7 @@ namespace Snap.Engine.Screens.Helpers;
 /// </summary>
 /// <remarks>
 /// A <see cref="TransitionScreen"/> is typically used to manage visual or logical transitions
-/// between two different screens in the application. Examples include fade‑in/fade‑out effects,
-/// loading indicators, or splash sequences.
+/// between two different screens in the application.
 /// </remarks>
 public class TransitionScreen : Screen
 {
@@ -70,13 +69,7 @@ public class TransitionScreen : Screen
 		Layer = 100; // Default to 100
 	}
 
-	/// <summary>
-	/// Called when the screen is entered.
-	/// </summary>
-	/// <remarks>
-	/// This method adds a transparent <see cref="ColorRect"/> entity to the scene,
-	/// starts the transition routine, and then invokes the base implementation.
-	/// </remarks>
+	/// <inheritdoc />
 	protected override void OnEnter()
 	{
 		AddEntity(_rect = new ColorRect()

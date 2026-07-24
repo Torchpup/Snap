@@ -53,7 +53,7 @@ public class GridPanel : Panel
 				OnItemSelected?.Invoke(this);
 			}
 
-			SetDirtyState(DirtyState.Update);
+			SetDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 
@@ -172,7 +172,7 @@ public class GridPanel : Panel
 		UpdateSelectionChanged(visible);
 
 		if (IsTopmostScreen || Parent == null)
-			Screen?.SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			Screen?.SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 
 		base.OnDirty(state);
 	}

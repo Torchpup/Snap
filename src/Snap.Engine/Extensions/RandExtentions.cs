@@ -15,12 +15,10 @@ public static class RandExtentions
 	/// <returns>A randomly selected item.</returns>
 	/// <exception cref="ArgumentException">Thrown if <paramref name="rng"/> is null or if <paramref name="items"/> is empty.</exception>
 	/// <exception cref="ArgumentNullException">Thrown if <paramref name="items"/> is null.</exception>
-	public static T Choice<T>(this FastRandom rng, params T[] items)
+	public static T Choice<T>(this FastRandom rng, params Span<T> items)
 	{
-		if (rng == null) throw new ArgumentException(nameof(rng));
-		if (items == null) throw new ArgumentNullException(nameof(items));
-		if (items.Length == 0)
-			throw new ArgumentException("Must provide at least one item.", nameof(items));
+		if (rng == null) throw new ArgumentNullException(nameof(rng));
+		if (items.Length == 0) throw new ArgumentException("Must provide at least one item.", nameof(items));
 
 		int idx = rng.NextInt(items.Length);
 		return items[idx];
@@ -117,9 +115,18 @@ public static class RandExtentions
 	/// <returns>A randomly selected enum value.</returns>
 	public static TEnum RandomEnum<TEnum>(this FastRandom rng) where TEnum : struct, Enum
 	{
-		var vals = Enum.GetValues<TEnum>();
-		return vals[rng.NextInt(0, vals.Length)];
+		// var vals = Enum.GetValues<TEnum>();
+		// return vals[rng.NextInt(0, vals.Length)];
+		var type = typeof(TEnum);
+		if (!_enumCache.TryGetValue(type, out var values))
+		{
+			values = Enum.GetValues(type);
+			_enumCache[type] = values;
+		}
+
+		return (TEnum)values.GetValue(rng.NextInt(values.Length));
 	}
+	private static readonly Dictionary<Type, Array> _enumCache = [];
 
 	/// <summary>
 	/// Returns either 1 or -1 randomly.

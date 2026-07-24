@@ -20,7 +20,7 @@ namespace Snap.Engine.Graphics;
 /// </remarks>
 public class ObjectPool<T> where T : class
 {
-	private readonly Stack<T> _pool = new();
+	private readonly Stack<T> _pool = [];
 	private readonly Func<T> _createFunc;
 	private readonly Action<T> _resetAction;
 

@@ -47,11 +47,11 @@ public static class HashHelpers
 	}
 
 	/// <summary>
-	/// Computes the 32‑bit FNV‑1a hash of the given byte array.
+	/// Computes the 32‑bit FNV‑1a hash of the given byte span.
 	/// </summary>
 	/// <param name="data">The input data to hash.</param>
 	/// <returns>The 32‑bit FNV‑1a hash value.</returns>
-	public static uint Hash32(byte[] data)
+	public static uint Hash32(ReadOnlySpan<byte> data)
 	{
 		const uint offsetBasis = 2166136261u;
 		const uint prime = 16777619u;
@@ -66,11 +66,11 @@ public static class HashHelpers
 	}
 
 	/// <summary>
-	/// Computes the 64‑bit FNV‑1a hash of the given byte array.
+	/// Computes the 64‑bit FNV‑1a hash of the given byte span.
 	/// </summary>
 	/// <param name="data">The input data to hash.</param>
 	/// <returns>The 64‑bit FNV‑1a hash value.</returns>
-	public static ulong Hash64(byte[] data)
+	public static ulong Hash64(ReadOnlySpan<byte> data)
 	{
 		const ulong offsetBasis = 1469598103934665603ul;
 		const ulong prime = 1099511628211ul;

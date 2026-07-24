@@ -60,10 +60,6 @@ public sealed class ContentTypeWriter : BinaryWriter
 	/// </summary>
 	/// <typeparam name="T">The type of the object to serialize.</typeparam>
 	/// <param name="value">The object to write.</param>
-	/// <remarks>
-	/// The object is serialized to a byte array using <see cref="XmlSerializer"/>,
-	/// and the length of the array is written before the array itself.
-	/// </remarks>
 	public void WriteObject<T>(T value)
 	{
 		using var ms = new MemoryStream();

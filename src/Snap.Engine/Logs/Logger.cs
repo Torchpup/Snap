@@ -128,8 +128,8 @@ public sealed class Logger : TextWriter, IDisposable
 	/// </summary>
 	/// <param name="value">The character to write.</param>
 	/// <remarks>
-	/// Before writing, each sink is checked for rotation needs using <see cref="ILogSink.RotateIfNeeded(long)"/>.
-	/// If the logger has been disposed, the method returns immediately without performing any action.
+	/// Before writing, each sink is checked for rotation needs. If the logger has been disposed, the method 
+	/// returns immediately without performing any action.
 	/// </remarks>
 	public override void Write(char value)
 	{
@@ -153,10 +153,8 @@ public sealed class Logger : TextWriter, IDisposable
 	/// <remarks>
 	/// The method calculates the byte count of the string using the default encoding
 	/// to determine if rotation is needed before writing. Each sink is then instructed
-	/// to rotate if necessary and receives the text.
-	/// 
-	/// If the <see cref="Logger"/> has been disposed, the method returns immediately
-	/// without performing any action.
+	/// to rotate if necessary and receives the text. If the <see cref="Logger"/> has 
+	/// been disposed, the method returns immediately without performing any action.
 	/// </remarks>
 	public override void Write(string value)
 	{
@@ -183,9 +181,6 @@ public sealed class Logger : TextWriter, IDisposable
 	/// The method calculates the byte count of the text plus the line terminator using the default encoding
 	/// to determine if rotation is needed before writing. Each sink is instructed to rotate if necessary
 	/// and then receives the text.  
-	/// 
-	/// The written entry is also enqueued into the recent entries buffer. If the buffer exceeds
-	/// <see cref="_maxRecentEntries"/>, the oldest entry is dequeued to maintain the limit.
 	/// 
 	/// If the <see cref="Logger"/> has been disposed, the method returns immediately without performing any action.
 	/// </remarks>
@@ -234,18 +229,21 @@ public sealed class Logger : TextWriter, IDisposable
 	/// Logs a message with the specified severity level.
 	/// </summary>
 	/// <param name="level">
-	/// The <see cref="LogLevel"/> of the message. Messages below the current <see cref="Logger.Level"/> are ignored.
+	/// The <see cref="LogLevel"/> of the message. Messages below the current <see cref="Level"/>
+	/// are ignored.
 	/// </param>
 	/// <param name="message">
 	/// The message text to log.
 	/// </param>
 	/// <remarks>
-	/// The method prefixes the message with a severity indicator and timestamp, then writes it to all registered sinks
-	/// using <see cref="WriteLine(string)"/>.  
-	/// 
-	/// Additionally, the entry is written to the debug output via <see cref="Debug.WriteLine(string)"/>.
-	/// If the <see cref="Logger"/> has been disposed, or if the specified level is lower than the configured minimum,
-	/// the message is ignored.
+	/// <para>
+	/// The method prefixes the message with a severity indicator and timestamp, then writes it
+	/// to all registered sinks. Additionally, the entry is written to the debug output.
+	/// </para>
+	/// <para>
+	/// If the <see cref="Logger"/> has been disposed, or if the specified level is lower than
+	/// the configured minimum, the message is ignored.
+	/// </para>
 	/// </remarks>
 	public void Log(LogLevel level, string message)
 	{
@@ -276,11 +274,14 @@ public sealed class Logger : TextWriter, IDisposable
 	/// The <see cref="LogLevel"/> to use when logging the exception. Defaults to <see cref="LogLevel.Error"/>.
 	/// </param>
 	/// <remarks>
+	/// <para>
 	/// This method traverses the exception chain, logging each unique exception message and stack trace.
 	/// A <see cref="HashSet{T}"/> is used to avoid infinite loops in case of cyclic inner exceptions.
-	/// 
-	/// If the <see cref="Logger"/> has been disposed, or if the specified level is lower than the configured minimum,
-	/// the exception is ignored.
+	/// </para>
+	/// <para>
+	/// If the <see cref="Logger"/> has been disposed, or if the specified level is lower than the
+	/// configured minimum, the exception is ignored.
+	/// </para>
 	/// </remarks>
 	public void LogException(Exception ex, LogLevel level = LogLevel.Error)
 	{
@@ -297,22 +298,25 @@ public sealed class Logger : TextWriter, IDisposable
 	}
 
 	/// <summary>
-	/// Logs a collection of key–value pairs at the specified severity level.
+	/// Logs a collection of key-value pairs at the specified severity level.
 	/// </summary>
 	/// <param name="level">
 	/// The <see cref="LogLevel"/> to use when logging the fields. Entries below the current
 	/// <see cref="Level"/> are ignored.
 	/// </param>
 	/// <param name="fields">
-	/// A set of key–value pairs to log. Each pair is formatted as <c>Key=Value</c>,
+	/// A set of key-value pairs to log. Each pair is formatted as <c>Key=Value</c>,
 	/// separated by spaces.
 	/// </param>
 	/// <remarks>
+	/// <para>
 	/// The method builds a single log entry string from the provided fields and passes it
-	/// to <see cref="Log(LogLevel, string)"/>.  
-	/// 
+	/// to <see cref="Log(LogLevel, string)"/>.
+	/// </para>
+	/// <para>
 	/// If the <see cref="Logger"/> has been disposed, or if the specified level is lower than
 	/// the configured minimum, the fields are ignored.
+	/// </para>
 	/// </remarks>
 	public void LogFields(LogLevel level, params (string Key, object Value)[] fields)
 	{
@@ -339,10 +343,6 @@ public sealed class Logger : TextWriter, IDisposable
 	/// <returns>
 	/// An array containing the recent log entries, ordered from oldest to newest.
 	/// </returns>
-	/// <remarks>
-	/// The number of entries returned is limited by <see cref="_maxRecentEntries"/>.
-	/// Thread-safe access is ensured by locking on <see cref="_syncLock"/>.
-	/// </remarks>
 	public string[] GetRecentEntries()
 	{
 		using (_syncLock.EnterScope())

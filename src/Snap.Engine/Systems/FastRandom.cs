@@ -346,7 +346,7 @@ public sealed class FastRandom
 
 		s1 ^= s0;
 		_state0 = RotateLeft(s0, 55) ^ s1 ^ s1 << 14;
-		_state0 = RotateLeft(s1, 36);
+		_state1 = RotateLeft(s1, 36);
 
 		return result;
 	}

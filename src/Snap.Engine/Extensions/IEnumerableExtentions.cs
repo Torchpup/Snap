@@ -33,6 +33,25 @@ public static class IEnumerableExtensions
 			action(item);
 	}
 
+	/// <summary>Returns a random element from the collection using the specified random generator.</summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="source">Collection to pick from.</param>
+	/// <param name="random">Random generator to use.</param>
+	/// <returns>A random element from the collection.</returns>
+	/// <exception cref="ArgumentNullException">source or random is null.</exception>
+	/// <exception cref="InvalidOperationException">Collection is empty.</exception>
+	public static T Random<T>(this IEnumerable<T> source, FastRandom random)
+		=> random.Choice(source);
+
+	/// <summary>Returns a random element from the collection using the default <see cref="FastRandom"/> instance.</summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="source">Collection to pick from.</param>
+	/// <returns>A random element from the collection.</returns>
+	/// <exception cref="ArgumentNullException">source is null.</exception>
+	/// <exception cref="InvalidOperationException">Collection is empty.</exception>
+	public static T Random<T>(this IEnumerable<T> source)
+		=> source.Random(FastRandom.Instance);
+
 	/// <summary>
 	/// Safely retrieves the element at the given <paramref name="index"/>, or returns default if out of range.
 	/// </summary>

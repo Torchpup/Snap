@@ -177,7 +177,7 @@ public sealed class Listview : RenderTarget
 				_selectedIndex = target - _scrollIndex;
 			}
 
-			SetDirtyState(DirtyState.Update);
+			SetDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 
@@ -194,7 +194,7 @@ public sealed class Listview : RenderTarget
 			_spacing = value;
 			// recalc container size when spacing changes
 			RecalculateSize();
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 	}
 
@@ -210,7 +210,7 @@ public sealed class Listview : RenderTarget
 			_direction = value;
 
 			RecalculateSize();
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 	}
 
@@ -281,9 +281,9 @@ public sealed class Listview : RenderTarget
 		_selectedIndex = Math.Clamp(_selectedIndex, 0, MaxSelectedIndex);
 
 		foreach (var p in this.GetAncestorsOfType<Panel>())
-			p.SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			p.SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 
-		SetDirtyState(DirtyState.Sort | DirtyState.Update);
+		SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 	}
 
 	/// <summary>
@@ -296,7 +296,7 @@ public sealed class Listview : RenderTarget
 		_selectedIndex = 0;
 		_scrollIndex = 0;
 
-		SetDirtyState(DirtyState.Sort | DirtyState.Update);
+		SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 	}
 
 	/// <summary>
@@ -316,7 +316,7 @@ public sealed class Listview : RenderTarget
 		_selectedIndex = Math.Min(_selectedIndex, MaxSelectedIndex);
 		_selectedIndex = Math.Max(_scrollIndex, 0);
 
-		SetDirtyState(DirtyState.Sort | DirtyState.Update);
+		SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 
 		return result;
 	}
@@ -411,7 +411,7 @@ public sealed class Listview : RenderTarget
 		}
 
 		_itemTimeout += PerItemTimeout;
-		SetDirtyState(DirtyState.Update);
+		SetDirtyState(DirtyState.AddOrRemove);
 	}
 
 	/// <summary>
@@ -439,7 +439,7 @@ public sealed class Listview : RenderTarget
 		}
 
 		_itemTimeout += PerItemTimeout;
-		SetDirtyState(DirtyState.Update);
+		SetDirtyState(DirtyState.AddOrRemove);
 	}
 
 	/// <summary>

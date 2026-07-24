@@ -36,16 +36,6 @@ public sealed class WindowCreationException : Exception
 /// Represents the core game instance, responsible for managing engine state, settings, input,
 /// and application lifecycle.
 /// </summary>
-/// <remarks>
-/// <see cref="Game"/> is the central entry point of the engine.  
-/// It enforces a singleton instance via <see cref="Game.Instance"/> and provides access to
-/// engine settings, input mapping, version information, and application directories.  
-/// 
-/// Because <see cref="Game"/> implements <see cref="IDisposable"/>, it must be properly disposed
-/// to release unmanaged resources, close windows, and flush pending operations.  
-/// Typical usage involves creating the game instance, running the main loop, and disposing
-/// it at shutdown.
-/// </remarks>
 public class Game : IDisposable
 {
 	private const int TotalFpsQueueSamples = 16;
@@ -64,10 +54,6 @@ public class Game : IDisposable
 	/// <summary>
 	/// Gets the singleton instance of the <see cref="Game"/>.
 	/// </summary>
-	/// <remarks>
-	/// The engine enforces a single global <see cref="Game"/> instance to manage runtime state,
-	/// settings, input, and application folders.
-	/// </remarks>
 	public static Game Instance { get; private set; }
 
 	/// <summary>
@@ -80,74 +66,43 @@ public class Game : IDisposable
 	public EngineSettings Settings { get; }
 
 	/// <summary>
-	/// Gets a value indicating whether the game is currently active.
+	/// Gets a value indicating whether the game window is currently active and in focus.
 	/// </summary>
-	/// <remarks>
-	/// Defaults to <c>true</c>. This property can be toggled internally by the engine
-	/// to reflect focus or suspension state.
-	/// </remarks>
 	public bool IsActive { get; private set; } = true;
 
 	/// <summary>
 	/// Gets the version string of the currently executing assembly.
 	/// </summary>
-	/// <remarks>
-	/// This property retrieves the version metadata from the assembly manifest.
-	/// </remarks>
 	public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
 	/// <summary>
 	/// Gets a hashed representation of the current <see cref="Version"/>.
 	/// </summary>
-	/// <remarks>
-	/// Uses <see cref="HashHelpers.Cache64(string)"/> to generate a 64-bit hash of the version string,
-	/// formatted as an 8-character hexadecimal value.
-	/// </remarks>
 	public string VersionHash => $"{HashHelpers.Cache64(Version):X8}";
 
 	/// <summary>
 	/// Gets the application version as a formatted string.
 	/// </summary>
-	/// <remarks>
-	/// Returns the value set via <see cref="EngineSettings.WithAppVersion"/>, formatted as <c>major.minor.build</c>.
-	/// </remarks>
 	public string AppVersion => Settings.AppVersion.ToString();
 
 	/// <summary>
 	/// Gets a stable 8-character hexadecimal hash of the application version.
 	/// </summary>
-	/// <remarks>
-	/// Derived from <see cref="AppVersion"/> using a 64-bit cache hash. Useful for cache busting,
-	/// save file versioning, or network compatibility checks.
-	/// </remarks>
 	public string AppVersionHash => $"{HashHelpers.Cache64(AppVersion):X8}";
 
 	/// <summary>
 	/// Gets the input map for the game.
 	/// </summary>
-	/// <remarks>
-	/// Provides access to input bindings and state, allowing the engine to query
-	/// keyboard, mouse, and controller inputs.
-	/// </remarks>
 	public InputMap Input { get; private set; }
 
 	/// <summary>
 	/// Gets the root application data folder for the game.
 	/// </summary>
-	/// <remarks>
-	/// The folder path is resolved using <see cref="FileHelpers.GetApplicationData(string,string)"/> 
-	/// with the company and application name from <see cref="Settings"/>.
-	/// </remarks>
 	public string ApplicationFolder => FileHelpers.GetApplicationData(Settings.AppCompany, Settings.AppName);
 
 	/// <summary>
 	/// Gets the absolute path to the application's content root folder.
 	/// </summary>
-	/// <remarks>
-	/// The path is constructed by combining the application's base directory
-	/// (<see cref="AppContext.BaseDirectory"/>) with the configured content root
-	/// specified in <see cref="EngineSettings.AppContentRoot"/>.
-	/// </remarks>
 	/// <returns>
 	/// A string representing the full path to the content root folder.
 	/// </returns>
@@ -156,17 +111,11 @@ public class Game : IDisposable
 	/// <summary>
 	/// Gets the folder path where application logs are stored.
 	/// </summary>
-	/// <remarks>
-	/// Combines <see cref="ApplicationFolder"/> with <see cref="EngineSettings.LogDirectory"/>.
-	/// </remarks>
 	public string ApplicationLogFolder => Path.Combine(ApplicationFolder, Settings.LogDirectory);
 
 	/// <summary>
 	/// Gets the folder path where application save data is stored.
 	/// </summary>
-	/// <remarks>
-	/// Combines <see cref="ApplicationFolder"/> with <see cref="EngineSettings.SaveDirectory"/>.
-	/// </remarks>
 	public string ApplicationSaveFolder => Path.Combine(ApplicationFolder, Settings.SaveDirectory);
 
 	/// <summary>
@@ -174,9 +123,6 @@ public class Game : IDisposable
 	/// If the value is identical to the current setting, no changes are marked for application.
 	/// </summary>
 	/// <param name="value">True to enable fullscreen mode; false to use windowed mode.</param>
-	/// <remarks>
-	/// Sets <see cref="_canApplyChanges"/> to true only if the fullscreen state differs from the existing setting.
-	/// </remarks>
 	public void ApplyFullScreenChange(bool value)
 	{
 		if (Settings.FullScreen == value)
@@ -195,9 +141,6 @@ public class Game : IDisposable
 	/// </summary>
 	/// <param name="width">The desired window width in pixels. Must be greater than zero.</param>
 	/// <param name="height">The desired window height in pixels. Must be greater than zero.</param>
-	/// <remarks>
-	/// Updates <see cref="EngineSettings.Window"/> and flags <see cref="_canApplyChanges"/> if a valid size change is detected.
-	/// </remarks>
 	public void ApplyWindowSizeChange(uint width, uint height)
 	{
 		if (width <= 0)
@@ -225,9 +168,6 @@ public class Game : IDisposable
 	/// If the new value is the same as the current one, no action is taken.
 	/// </summary>
 	/// <param name="value">True to enable VSync; false to disable it.</param>
-	/// <remarks>
-	/// Sets <see cref="_canApplyChanges"/> to true only when the setting differs from the current configuration.
-	/// </remarks>
 	public void ApplyVSyncChange(bool value)
 	{
 		if (Settings.VSync == value)
@@ -245,9 +185,6 @@ public class Game : IDisposable
 	/// If the provided value matches the existing configuration, no change is queued.
 	/// </summary>
 	/// <param name="value">The desired antialiasing level (samples per pixel). Must be a non-negative integer.</param>
-	/// <remarks>
-	/// Converts the value to an integer and marks <see cref="_canApplyChanges"/> only if the level differs.
-	/// </remarks>
 	public void ApplyAntialiasingChange(uint value)
 	{
 		if (Settings.Antialiasing == value)
@@ -275,7 +212,6 @@ public class Game : IDisposable
 	/// <item>Reattach input handlers and event listeners.</item>
 	/// <item>Center the window if not in fullscreen mode.</item>
 	/// </list>
-	/// After successful execution, <see cref="_canApplyChanges"/> is reset to false.
 	/// </remarks>
 	public void ApplyChanges()
 	{
@@ -515,9 +451,6 @@ public class Game : IDisposable
 			throw new WindowCreationException("Unexpected error while creating SNAP window.", ex);
 		}
 
-		// ToRenderer.Closed += (_, _) => ToRenderer.Close();
-		// ToRenderer.GainedFocus += (_, _) => IsActive = true;
-		// ToRenderer.LostFocus += (_, _) => IsActive = false;
 		ToRenderer.Closed += OnWindowClose;
 		ToRenderer.GainedFocus += OnGainedFocus;
 		ToRenderer.LostFocus += OnLostFocus;

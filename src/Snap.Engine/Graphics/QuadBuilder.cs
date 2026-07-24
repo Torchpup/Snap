@@ -87,25 +87,25 @@ internal static class QuadBuilder
 		output[5] = new SFVertex(new SFVectF(localPos[3].X, localPos[3].Y), color, new SFVectF(u1, v2));
 	}
 
-	public static void BuildQuad(
-		SFVertex[] output,
-		Rect2 dstRect,
-		Rect2 srcRect,
-		Color color,
-		int depth = 0)
-	{
-		BuildQuad(output, dstRect, srcRect, color,
-			Vect2.Zero, Vect2.One, 0f, TextureEffects.None, null);
-	}
+	// public static void BuildQuad(
+	// 	SFVertex[] output,
+	// 	Rect2 dstRect,
+	// 	Rect2 srcRect,
+	// 	Color color,
+	// 	int depth = 0)
+	// {
+	// 	BuildQuad(output, dstRect, srcRect, color,
+	// 		Vect2.Zero, Vect2.One, 0f, TextureEffects.None, null);
+	// }
 
-	public static void BuildQuad(
-		SFVertex[] output,
-		Vect2 position,
-		Vect2 size,
-		Rect2 srcRect,
-		Color color)
-	{
-		BuildQuad(output, new Rect2(position, size), srcRect, color,
-			Vect2.Zero, Vect2.One, 0f, TextureEffects.None, null);
-	}
+	// public static void BuildQuad(
+	// 	SFVertex[] output,
+	// 	Vect2 position,
+	// 	Vect2 size,
+	// 	Rect2 srcRect,
+	// 	Color color)
+	// {
+	// 	BuildQuad(output, new Rect2(position, size), srcRect, color,
+	// 		Vect2.Zero, Vect2.One, 0f, TextureEffects.None, null);
+	// }
 }

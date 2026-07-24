@@ -20,7 +20,7 @@ public enum DirtyState : uint // Used for Entity and ScreenManager
 	/// <summary>
 	/// Indicates that entities were added or removed and the collection needs to be updated.
 	/// </summary>
-	Update = 1 << 1,
+	AddOrRemove = 1 << 1,
 }
 
 /// <summary>
@@ -34,7 +34,7 @@ public sealed class ScreenManager
 	private readonly List<Screen> _screens = [];
 	private readonly Dictionary<uint, Screen> _screensById = [];
 	private readonly List<Screen> _updateScreens = [];
-	
+
 	private DirtyState _dirtyState;
 
 	/// <summary>
@@ -65,7 +65,7 @@ public sealed class ScreenManager
 
 		if (_dirtyState != DirtyState.None)
 		{
-			if (_dirtyState.HasFlag(DirtyState.Update))
+			if (_dirtyState.HasFlag(DirtyState.AddOrRemove))
 			{
 				_updateScreens.Clear();
 				_updateScreens.EnsureCapacity(_screens.Count);
@@ -99,7 +99,7 @@ public sealed class ScreenManager
 			}
 		}
 
-		if (EngineSettings.Instance.DebugDraw)
+		if (EngineSettings.Instance.DebugDraw != DebugDrawMode.None)
 			DebugRenderer.Instance.Begin();
 
 		Renderer.Instance.Begin();
@@ -118,7 +118,7 @@ public sealed class ScreenManager
 
 		Renderer.Instance.End();
 
-		if (EngineSettings.Instance.DebugDraw)
+		if (EngineSettings.Instance.DebugDraw != DebugDrawMode.None)
 			DebugRenderer.Instance.End();
 	}
 
@@ -146,7 +146,7 @@ public sealed class ScreenManager
 			_screensById.Add(screen.Id, screen);
 		}
 
-		_dirtyState = DirtyState.Update | DirtyState.Sort;
+		_dirtyState = DirtyState.AddOrRemove | DirtyState.Sort;
 	}
 
 	/// <summary>
@@ -174,7 +174,7 @@ public sealed class ScreenManager
 		}
 
 		if (anyRemoved)
-			_dirtyState = DirtyState.Update | DirtyState.Sort;
+			_dirtyState = DirtyState.AddOrRemove | DirtyState.Sort;
 	}
 
 	/// <summary>
@@ -216,7 +216,7 @@ public sealed class ScreenManager
 	/// </summary>
 	/// <remarks>
 	/// This method removes all currently active screens using the <see cref="Remove"/> method
-	/// and sets the <see cref="_dirtyState"/> flag to <see cref="DirtyState.Update"/>.
+	/// and sets the <see cref="_dirtyState"/> flag to <see cref="DirtyState.AddOrRemove"/>.
 	/// </remarks>
 	public void Clear()
 	{
@@ -225,7 +225,7 @@ public sealed class ScreenManager
 
 		Remove([.. _screens]);
 
-		_dirtyState = DirtyState.Update;
+		_dirtyState = DirtyState.AddOrRemove;
 	}
 
 	internal void UpdateDirtyState(DirtyState state) => _dirtyState = state;

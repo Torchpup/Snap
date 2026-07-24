@@ -56,15 +56,6 @@ public sealed class Spritesheet : IAsset
 			return;
 		}
 
-		// Read JSON via provider (works from FS or .spack)
-		// byte[] bytes;
-		// using (var s = AssetManager.OpenStream(Tag))
-		// using (var ms = new MemoryStream())
-		// {
-		// 	s.CopyTo(ms);
-		// 	bytes = ms.ToArray();
-		// }
-
 		var doc = JsonDocument.Parse(Data);
 		var root = doc.RootElement;
 		var meta = root.GetProperty("meta");
@@ -112,10 +103,7 @@ public sealed class Spritesheet : IAsset
 		}
 
 		IsValid = true;
-		// Length = (ulong)bytes.Length;
 		LastAccessTime = DateTime.Now;
-
-		// return Length;
 	}
 
 	/// <summary>
@@ -142,6 +130,18 @@ public sealed class Spritesheet : IAsset
 
 		IsValid = false;
 	}
+
+
+	/// <summary>
+	/// Checks if a sprite with the specified name exists in this spritesheet.
+	/// </summary>
+	/// <param name="name">The name of the sprite to check.</param>
+	/// <returns>
+	/// <see langword="true"/> if the sprite exists; otherwise, <see langword="false"/>.
+	/// </returns>
+	public bool Contains(string name) =>
+		_spritesheets.TryGetValue(HashHelpers.Cache32(name), out _);
+
 
 	/// <summary>
 	/// Retrieves the bounding rectangle of a sprite by name.
@@ -170,16 +170,6 @@ public sealed class Spritesheet : IAsset
 
 		return result.Bounds;
 	}
-
-	/// <summary>
-	/// Checks if a sprite with the specified name exists in this spritesheet.
-	/// </summary>
-	/// <param name="name">The name of the sprite to check.</param>
-	/// <returns>
-	/// <see langword="true"/> if the sprite exists; otherwise, <see langword="false"/>.
-	/// </returns>
-	public bool Contains(string name) =>
-		_spritesheets.TryGetValue(HashHelpers.Cache32(name), out _);
 
 	/// <summary>
 	/// Attempts to retrieve the bounding rectangle of a sprite by name.
@@ -227,7 +217,7 @@ public sealed class Spritesheet : IAsset
 		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new KeyNotFoundException($"No spritesheet entry found for name '{name}'.");
 		if (result.Patch.IsEmpty)
-			throw new Exception($"9-slice patch for '{name}' has not been defined.");
+			throw new InvalidOperationException($"9-slice patch for '{name}' has not been defined.");
 
 		LastAccessTime = DateTime.Now;
 
@@ -280,7 +270,7 @@ public sealed class Spritesheet : IAsset
 		if (!_spritesheets.TryGetValue(HashHelpers.Cache32(name), out var result))
 			throw new KeyNotFoundException($"No spritesheet entry found for name '{name}'.");
 		if (result.Pivot.IsZero)
-			throw new Exception($"Pivot point for '{name}' has not been set.");
+			throw new InvalidOperationException($"Pivot point for '{name}' has not been set.");
 
 		LastAccessTime = DateTime.Now;
 

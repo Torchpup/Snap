@@ -39,11 +39,6 @@ public static class SoundExtentions
 	/// For sounds that need manual control (pausing, stopping, or monitoring), use
 	/// <see cref="Sound.CreateInstance"/> or <see cref="SoundInstance.Play()"/> instead.
 	/// </para>
-	/// <example>
-	/// <code>
-	/// explosionSound.PlayOneShot(volume: 0.8f, pan: -0.3f);
-	/// </code>
-	/// </example>
 	/// </remarks>
 	public static SoundInstance PlayOneShot(this Sound sound, float volume = 1f, float pan = 0f, float pitch = 1f)
 	{

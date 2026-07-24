@@ -47,7 +47,7 @@ public class AnchorPanel : Panel
 		float x = AlignHelpers.AlignWidth(parentSize.X, mySize.X, HAlign, Offset.X);
 		float y = AlignHelpers.AlignHeight(parentSize.Y, mySize.Y, VAlign, Offset.Y);
 
-		Position = new Vect2(x, y);
+		LocalPosition = new Vect2(x, y);
 
 		base.OnDirty(state);
 	}

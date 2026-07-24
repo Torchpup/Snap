@@ -3,13 +3,6 @@ namespace Snap.Engine;
 /// <summary>
 /// Represents a display monitor's resolution and aspect ratio.
 /// </summary>
-/// <remarks>
-/// This struct is typically used to describe the desktop monitor or a supported
-/// fullscreen resolution when enumerating available display modes.
-/// </remarks>
-/// <remarks>
-/// Initializes a new instance of the <see cref="Monitor"/> struct.
-/// </remarks>
 /// <param name="width">The width of the monitor in pixels.</param>
 /// <param name="height">The height of the monitor in pixels.</param>
 public readonly struct Monitor(int width, int height)

@@ -34,10 +34,10 @@ public class Panel : Entity
 			base.Size = value;
 			_isAutoSize = false;
 
-			// foreach (var p in this.GetAncestorsOfType<Panel>())
-			// 	p.SetDirtyState(DirtyState.Update | DirtyState.Sort);
+			foreach (var p in this.GetAncestorsOfType<Panel>())
+				p.SetDirtyState(DirtyState.AddOrRemove | DirtyState.Sort);
 
-			SetDirtyState(DirtyState.Update | DirtyState.Sort);
+			SetDirtyState(DirtyState.AddOrRemove | DirtyState.Sort);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class Panel : Entity
 			_isAutoSize = value;
 
 			if (_isAutoSize)
-				SetDirtyState(DirtyState.Update | DirtyState.Sort);
+				SetDirtyState(DirtyState.AddOrRemove | DirtyState.Sort);
 		}
 	}
 
@@ -100,7 +100,7 @@ public class Panel : Entity
 			base.AddChild([.. _entityAdd]);
 			_entityAdd.Clear();
 
-			SetDirtyState(DirtyState.Update | DirtyState.Sort);
+			SetDirtyState(DirtyState.AddOrRemove | DirtyState.Sort);
 		}
 
 		base.OnEnter();
@@ -161,7 +161,7 @@ public class Panel : Entity
 
 			base.AddChild(children);
 
-			SetDirtyState(DirtyState.Update | DirtyState.Sort);
+			SetDirtyState(DirtyState.AddOrRemove | DirtyState.Sort);
 
 			for (int i = 0; i < children.Length; i++)
 				OnChildAdded(children[i]);
@@ -193,7 +193,7 @@ public class Panel : Entity
 
 		if (base.RemoveChild(children))
 		{
-			SetDirtyState(DirtyState.Update);
+			SetDirtyState(DirtyState.AddOrRemove);
 
 			for (int i = 0; i < children.Length; i++)
 				OnChildRemoved(children[i]);
@@ -228,7 +228,7 @@ public class Panel : Entity
 		{
 			OnChildrenCleared();
 
-			SetDirtyState(DirtyState.Update);
+			SetDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 

@@ -202,15 +202,10 @@ public class Texture : IAsset
 
 			case TextureState.Load:
 				LoadTexture(); break;
-
-				// Render texture, if stored from
-				// _ => _texture.Size.X * _texture.Size.Y * 4UL,
 		}
 
 		IsValid = true;
 		LastAccessTime = DateTime.Now;
-
-		// return Length;
 	}
 
 	/// <inheritdoc/>
@@ -243,25 +238,19 @@ public class Texture : IAsset
 
 	private void CreateTexture()
 	{
-		// var sfImage = new SFImage((uint)_texSize.X, (uint)_texSize.Y, _texColor);
 		_image = new SFImage(new((uint)_texSize.X, (uint)_texSize.Y), _texColor);
 		_texture = new SFTexture(_image);
 
 		Logger.Instance.Log(LogLevel.Info, $"Created Blank Texture with ID: {Id}, Size: (W{_texture.Size.X}, H{_texture.Size.Y})");
-		// Length = _texture.Size.X * _texture.Size.Y * 4;
-		// return Length;
 	}
 
 	private void LoadTexture()
 	{
-		// using var stream = AssetManager.OpenStream(Tag);
 		_texture = new SFTexture(Data)
 		{
 			Smooth = _smooth,
 			Repeated = _repeat
 		};
-		// Length = _texture.Size.X * _texture.Size.Y * 4;
-		// return Length;
 	}
 
 	/// <summary>

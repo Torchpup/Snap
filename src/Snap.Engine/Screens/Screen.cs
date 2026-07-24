@@ -15,7 +15,7 @@ public class Screen
 
 	private int _layer;
 	private bool _visible = true;
-	private DirtyState _dirtyState = DirtyState.Sort | DirtyState.Update;
+	private DirtyState _dirtyState = DirtyState.Sort | DirtyState.AddOrRemove;
 	private Entity[] _entityArrayBuffer = new Entity[256];
 	private int[] _indexBuffer = new int[256];
 
@@ -101,7 +101,7 @@ public class Screen
 
 			_visible = value;
 
-			ScreenManager.UpdateDirtyState(DirtyState.Update);
+			ScreenManager.UpdateDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 
@@ -128,62 +128,62 @@ public class Screen
 	/// Gets the safe region scale factor from the engine settings.  
 	/// This value defines the percentage of the screen considered safe for critical UI elements.
 	/// </summary>
-	public float SafeRegion => EngineSettings.Instance.SafeRegion;
+	protected float SafeRegion => EngineSettings.Instance.SafeRegion;
 
 	/// <summary>
 	/// Provides access to the global logger instance for logging debug or runtime information.
 	/// </summary>
-	public Logger Logger => Logger.Instance;
+	protected Logger Logger => Logger.Instance;
 
 	/// <summary>
 	/// Provides access to the global clock used for delta time and time tracking.
 	/// </summary>
-	public Clock Clock => Clock.Instance;
+	protected Clock Clock => Clock.Instance;
 
 	/// <summary>
 	/// Gets the singleton instance of the running engine.
 	/// </summary>
-	public Game Game => Game.Instance;
+	protected Game Game => Game.Instance;
 
 	/// <summary>
 	/// Gets the global random number generator used for deterministic or fast random operations.
 	/// </summary>
-	public FastRandom Rand => FastRandom.Instance;
+	protected FastRandom Rand => FastRandom.Instance;
 
 	/// <summary>
 	/// Provides access to the main renderer responsible for drawing entities and visuals.
 	/// </summary>
-	public Renderer Renderer => Renderer.Instance;
+	protected Renderer Renderer => Renderer.Instance;
 
 	/// <summary>
 	/// Gets the global input mapping system used for handling keyboard, mouse, and gamepad input.
 	/// </summary>
-	public InputMap Input => Game.Instance.Input;
+	protected InputMap Input => Game.Instance.Input;
 
 	/// <summary>
 	/// Provides access to the asset manager, responsible for loading and managing game assets.
 	/// </summary>
-	public AssetManager Assets => AssetManager.Instance;
+	protected AssetManager Assets => AssetManager.Instance;
 
 	/// <summary>
 	/// Manages cross-scene communication via beacon signaling and listening.
 	/// </summary>
-	public BeaconManager Beacon => BeaconManager.Instance;
+	protected BeaconManager Beacon => BeaconManager.Instance;
 
 	/// <summary>
 	/// Handles all sound playback, effects, and audio instances.
 	/// </summary>
-	public SoundManager SoundManager => SoundManager.Instance;
+	protected SoundManager SoundManager => SoundManager.Instance;
 
 	/// <summary>
 	/// Provides access to the screen manager which handles scene stacking and transitions.
 	/// </summary>
-	public ScreenManager ScreenManager => ScreenManager.Instance;
+	protected ScreenManager ScreenManager => ScreenManager.Instance;
 
 	/// <summary>
 	/// Manages coroutine execution tied to the screen's lifecycle.
 	/// </summary>
-	public CoroutineManager CoroutineManager => CoroutineManager.Instance;
+	protected CoroutineManager CoroutineManager => CoroutineManager.Instance;
 
 	/// <summary>
 	/// Provides access to the service manager for registering and retrieving game services.
@@ -193,340 +193,7 @@ public class Screen
 	/// Use <see cref="ServiceManager.GetService{T}"/> to retrieve services and 
 	/// <see cref="ServiceManager.RegisterService"/> to register new services.
 	/// </remarks>
-	public ServiceManager Services => ServiceManager.Instance;
-
-
-	// /// <summary>
-	// /// Loads a texture from the specified file.
-	// /// </summary>
-	// /// <param name="filename">The path to the texture file.</param>
-	// /// <param name="repeat">Whether the texture should repeat when drawn beyond its bounds.</param>
-	// /// <param name="smooth">Whether the texture should be smoothed (interpolated) when scaled.</param>
-	// /// <returns>The loaded <see cref="Texture"/> instance.</returns>
-	// public Texture LoadTexture(string filename, bool repeat = false, bool smooth = false)
-	// 	=> AssetManager.LoadTexture(filename, repeat, smooth);
-
-	// /// <summary>
-	// /// Loads a sprite font from the specified file.
-	// /// </summary>
-	// /// <param name="filename">The path to the font definition file.</param>
-	// /// <param name="spacing">Additional spacing between characters.</param>
-	// /// <param name="lineSpacing">Additional spacing between lines.</param>
-	// /// <param name="smoothing">Whether to apply smoothing to the font rendering.</param>
-	// /// <param name="charList">Optional custom character set to load.</param>
-	// /// <returns>The loaded <see cref="SpriteFont"/> instance.</returns>
-	// public SpriteFont LoadSpriteFont(string filename, float spacing = 0f, float lineSpacing = 0f, bool smoothing = false, string charList = null)
-	// 	=> AssetManager.LoadSpriteFont(filename, spacing, lineSpacing, smoothing, charList);
-
-	// /// <summary>
-	// /// Loads an LDTK map project from the specified file.
-	// /// </summary>
-	// /// <param name="filename">The path to the LDTK project file.</param>
-	// /// <returns>The loaded <see cref="LDtkMap"/> instance.</returns>
-	// public LDtkMap LoadMap(string filename)
-	// 	=> AssetManager.LoadMap(filename);
-
-	// /// <summary>
-	// /// Loads a spritesheet from the specified file.
-	// /// </summary>
-	// /// <param name="filename">The path to the spritesheet definition file.</param>
-	// /// <returns>The loaded <see cref="Spritesheet"/> instance.</returns>
-	// public Spritesheet LoadSheet(string filename)
-	// 	=> AssetManager.LoadSheet(filename);
-
-	// /// <summary>
-	// /// Loads a sound effect from the specified file.
-	// /// </summary>
-	// /// <param name="filename">The path to the sound file.</param>
-	// /// <param name="looped">Whether the sound should loop automatically when played.</param>
-	// /// <returns>The loaded <see cref="Sound"/> instance.</returns>
-	// public Sound LoadSound(string filename, bool looped = false)
-	// 	=> AssetManager.LoadSound(filename, looped);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded texture by name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the texture.</param>
-	// /// <returns>The <see cref="Texture"/> if found; otherwise, throws if not found.</returns>
-	// public Texture GetTexture(string name)
-	// 	=> AssetManager.GetTexture(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded texture using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the texture name.</param>
-	// /// <returns>The <see cref="Texture"/> if found; otherwise, throws if not found.</returns>
-	// public Texture GetTexture(Enum name)
-	// 	=> AssetManager.GetTexture(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a texture by name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the texture.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Texture"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the texture was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetTexture(string name, out Texture texture)
-	// 	=> AssetManager.TryGetTexture(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a texture using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the texture name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Texture"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the texture was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetTexture(Enum name, out Texture texture)
-	// 	=> AssetManager.TryGetTexture(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded LDTK map by name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the LDTK map asset.</param>
-	// /// <returns>The <see cref="LDtkMap"/> if found; otherwise, throws if not found.</returns>
-	// public LDtkMap GetMap(string name) => AssetManager.GetMap(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded LDTK map using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the map name.</param>
-	// /// <returns>The <see cref="LDtkMap"/> if found; otherwise, throws if not found.</returns>
-	// public LDtkMap GetMap(Enum name) => AssetManager.GetMap(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded LDTK map by name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the LDTK map asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="LDtkMap"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the map was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetMap(string name, out LDtkMap texture) => AssetManager.TryGetMap(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded LDTK map using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the map name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="LDtkMap"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the map was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetMap(Enum name, out LDtkMap texture) => AssetManager.TryGetMap(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded spritesheet by its name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the spritesheet asset.</param>
-	// /// <returns>The <see cref="Spritesheet"/> if found; otherwise, throws if not found.</returns>
-	// public Spritesheet GetSheet(string name) => AssetManager.GetSheet(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded spritesheet using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the spritesheet name.</param>
-	// /// <returns>The <see cref="Spritesheet"/> if found; otherwise, throws if not found.</returns>
-	// public Spritesheet GetSheet(Enum name) => AssetManager.GetSheet(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded spritesheet by name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the spritesheet asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Spritesheet"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the spritesheet was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetSheet(string name, out Spritesheet texture) => AssetManager.TryGetSheet(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded spritesheet using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the spritesheet name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Spritesheet"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the spritesheet was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetSheet(Enum name, out Spritesheet texture) => AssetManager.TryGetSheet(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded font by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the font asset.</param>
-	// /// <returns>The <see cref="Font"/> if found; otherwise, throws if not found.</returns>
-	// public Font GetFont(string name) => AssetManager.GetFont(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded font using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the font name.</param>
-	// /// <returns>The <see cref="Font"/> if found; otherwise, throws if not found.</returns>
-	// public Font GetFont(Enum name) => AssetManager.GetFont(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded font by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the font asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Font"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the font was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetFont(string name, out Font texture) => AssetManager.TryGetFont(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded font using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the font name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Font"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the font was found; otherwise, <c>false</c>.</returns>
-	// public bool TryGetFont(Enum name, out Font texture) => AssetManager.TryGetFont(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded bitmap font (.fnt file) by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the bitmap font asset.</param>
-	// /// <returns>The <see cref="BitmapFont"/> if found; otherwise, throws if not found.</returns>
-	// /// <remarks>This method is used to retrieve AngelCode-style bitmap fonts loaded via .fnt files.</remarks>
-	// public BitmapFont GetBitmapFont(string name) => AssetManager.GetBitmapFont(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded bitmap font (.fnt file) using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the bitmap font name.</param>
-	// /// <returns>The <see cref="BitmapFont"/> if found; otherwise, throws if not found.</returns>
-	// /// <remarks>This method is used to retrieve AngelCode-style bitmap fonts loaded via .fnt files.</remarks>
-	// public BitmapFont GetBitmapFont(Enum name) => AssetManager.GetBitmapFont(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded bitmap font (.fnt file) by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the bitmap font asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="BitmapFont"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the bitmap font was found; otherwise, <c>false</c>.</returns>
-	// /// <remarks>This method is used to retrieve AngelCode-style bitmap fonts loaded via .fnt files.</remarks>
-	// public bool TryGetBitmapFont(string name, out BitmapFont texture) => AssetManager.TryGetBitmapFont(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded bitmap font (.fnt file) using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the bitmap font name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="BitmapFont"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the bitmap font was found; otherwise, <c>false</c>.</returns>
-	// /// <remarks>This method is used to retrieve AngelCode-style bitmap fonts loaded via .fnt files.</remarks>
-	// public bool TryGetBitmapFont(Enum name, out BitmapFont texture) => AssetManager.TryGetBitmapFont(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded sprite font by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the sprite font asset.</param>
-	// /// <returns>The <see cref="SpriteFont"/> if found; otherwise, throws if not found.</returns>
-	// /// <remarks>
-	// /// Sprite fonts are texture-based fonts parsed using a flood-fill algorithm.  
-	// /// This is similar in concept to MonoGame’s SpriteFont system but custom to this engine.
-	// /// </remarks>
-	// public SpriteFont GetSpriteFont(string name) => AssetManager.GetSpriteFont(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded sprite font using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the sprite font name.</param>
-	// /// <returns>The <see cref="SpriteFont"/> if found; otherwise, throws if not found.</returns>
-	// /// <inheritdoc cref="GetSpriteFont(string)"/>
-	// public SpriteFont GetSpriteFont(Enum name) => AssetManager.GetSpriteFont(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded sprite font by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the sprite font asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="SpriteFont"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the sprite font was found; otherwise, <c>false</c>.</returns>
-	// /// <inheritdoc cref="GetSpriteFont(string)"/>
-	// public bool TryGetSpriteFont(string name, out SpriteFont texture) => AssetManager.TryGetSpriteFont(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded sprite font using an enum key.
-	// /// </summary>
-	// /// <param name="name">The enum key representing the sprite font name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="SpriteFont"/> if found; otherwise, null.</param>
-	// /// <returns><c>true</c> if the sprite font was found; otherwise, <c>false</c>.</returns>
-	// /// <inheritdoc cref="GetSpriteFont(string)"/>
-	// public bool TryGetSpriteFont(Enum name, out SpriteFont texture) => AssetManager.TryGetSpriteFont(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves a previously loaded sound asset by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the sound asset.</param>
-	// /// <returns>The <see cref="Sound"/> instance if found; otherwise, throws if not found.</returns>
-	// /// <remarks>
-	// /// Sounds are typically short audio clips used for effects, UI interactions, or environmental cues.
-	// /// </remarks>
-	// public Sound GetSound(string name) => AssetManager.GetSound(name);
-
-	// /// <summary>
-	// /// Retrieves a previously loaded sound asset using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum value representing the sound asset name.</param>
-	// /// <returns>The <see cref="Sound"/> instance if found; otherwise, throws if not found.</returns>
-	// /// <inheritdoc cref="GetSound(string)"/>
-	// public Sound GetSound(Enum name) => AssetManager.GetSound(name);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded sound asset by its string name.
-	// /// </summary>
-	// /// <param name="name">The name or path of the sound asset.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Sound"/> if found; otherwise, <c>null</c>.</param>
-	// /// <returns><c>true</c> if the sound was found; otherwise, <c>false</c>.</returns>
-	// /// <inheritdoc cref="GetSound(string)"/>
-	// public bool TryGetSound(string name, out Sound texture) => AssetManager.TryGetSound(name, out texture);
-
-	// /// <summary>
-	// /// Attempts to retrieve a loaded sound asset using an enum as the key.
-	// /// </summary>
-	// /// <param name="name">The enum value representing the sound asset name.</param>
-	// /// <param name="texture">When this method returns, contains the <see cref="Sound"/> if found; otherwise, <c>null</c>.</param>
-	// /// <returns><c>true</c> if the sound was found; otherwise, <c>false</c>.</returns>
-	// /// <inheritdoc cref="GetSound(string)"/>
-	// public bool TryGetSound(Enum name, out Sound texture) => AssetManager.TryGetSound(name, out texture);
-
-
-	// /// <summary>
-	// /// Retrieves the texture associated with a specific tileset from an LDTK project.
-	// /// </summary>
-	// /// <remarks>
-	// /// This method looks up the tileset definition within the provided <paramref name="project"/> 
-	// /// using the given <paramref name="tilesetId"/> and returns its texture resource.
-	// /// </remarks>
-	// /// <param name="project">
-	// /// The LDTK project instance containing tileset definitions and resources.
-	// /// </param>
-	// /// <param name="tilesetId">
-	// /// The unique identifier of the tileset whose texture should be retrieved.
-	// /// </param>
-	// /// <returns>
-	// /// A <see cref="Texture"/> object representing the tileset’s texture.  
-	// /// If the tileset cannot be found, the return value may be <c>null</c> or throw an exception 
-	// /// depending on implementation.
-	// /// </returns>
-	// public Texture GetTilesetTexture(LDtkMap project, uint tilesetId)
-	// 	=> AssetManager.GetTilesetTexture(project, tilesetId);
-
-	// /// <summary>
-	// /// Attempts to retrieve the texture associated with a specific tileset from an LDTK project.
-	// /// </summary>
-	// /// <remarks>
-	// /// This method calls <see cref="GetTilesetTexture(LDtkMap,uint)"/> internally and provides 
-	// /// the result via the <paramref name="texture"/> output parameter.  
-	// /// It follows the common "TryGet" pattern: returning <c>true</c> if the texture was found, 
-	// /// and <c>false</c> if it was not.
-	// /// </remarks>
-	// /// <param name="project">
-	// /// The LDTK project instance containing tileset definitions and resources.
-	// /// </param>
-	// /// <param name="tilesetId">
-	// /// The unique identifier of the tileset whose texture should be retrieved.
-	// /// </param>
-	// /// <param name="texture">
-	// /// When this method returns, contains the <see cref="Texture"/> object associated with the 
-	// /// specified tileset if found; otherwise <c>null</c>.
-	// /// </param>
-	// /// <returns>
-	// /// <c>true</c> if the tileset texture was successfully retrieved; otherwise, <c>false</c>.
-	// /// </returns>
-	// public bool TryGetTilesetTexture(LDtkMap project, uint tilesetId, out Texture texture)
-	// 	=> AssetManager.TryGetTilesetTexture(project, tilesetId, out texture);
+	protected ServiceManager Services => ServiceManager.Instance;
 
 
 	/// <summary>
@@ -573,7 +240,7 @@ public class Screen
 
 		if (_dirtyState != DirtyState.None)
 		{
-			if (_dirtyState.HasFlag(DirtyState.Update))
+			if (_dirtyState.HasFlag(DirtyState.AddOrRemove))
 			{
 				_updateEntities.Clear();
 				_updateEntities.EnsureCapacity(_entities.Count);
@@ -761,7 +428,7 @@ public class Screen
 			e.EngineOnEnter();
 		}
 
-		SetDirtyState(DirtyState.Sort | DirtyState.Update);
+		SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 	}
 
 	/// <summary>
@@ -794,7 +461,7 @@ public class Screen
 		}
 
 		if (anyRemoved)
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 	}
 
 	/// <summary>

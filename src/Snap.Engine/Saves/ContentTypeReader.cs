@@ -66,10 +66,6 @@ public sealed class ContentTypeReader : BinaryReader
 	/// </summary>
 	/// <typeparam name="T">The type of the object to deserialize.</typeparam>
 	/// <returns>The deserialized object.</returns>
-	/// <remarks>
-	/// The object is deserialized from a byte array previously written by <see cref="ContentTypeWriter.WriteObject{T}(T)"/>.
-	/// The length of the array is read first, followed by the array itself.
-	/// </remarks>
 	public T ReadObject<T>()
 	{
 		var length = ReadInt32();

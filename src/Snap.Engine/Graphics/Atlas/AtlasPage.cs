@@ -3,11 +3,6 @@ namespace Snap.Engine.Graphics.Atlas;
 /// <summary>
 /// Represents a single texture atlas page used for packing multiple smaller textures into one.
 /// </summary>
-/// <remarks>
-/// An atlas page holds a single <see cref="SFTexture"/> and uses a <see cref="SkylinePacker"/> 
-/// to efficiently allocate space for sub-textures. It tracks used pixel count but does not 
-/// support true removal under the Skyline packing algorithm.
-/// </remarks>
 public sealed class AtlasPage
 {
 	/// <summary>
@@ -30,11 +25,6 @@ public sealed class AtlasPage
 	/// </summary>
 	public long UsedPixels { get; private set; }
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="AtlasPage"/> class.
-	/// </summary>
-	/// <param name="pageSize">The width and height of the page in pixels. Pages are always square.</param>
-	/// <param name="pageIndex">The zero-based index of this page within the atlas manager.</param>
 	internal AtlasPage(int pageSize, int pageIndex)
 	{
 		PageIndex = pageIndex;

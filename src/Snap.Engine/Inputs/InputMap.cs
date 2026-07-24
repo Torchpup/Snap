@@ -57,11 +57,6 @@ public class InputMap
 	/// <summary>
 	/// Initializes a new <see cref="InputMap"/> and detects connected input devices.
 	/// </summary>
-	/// <remarks>
-	/// This constructor queries the system for connected gamepads using <see cref="SFJoystick"/> and
-	/// loads controller mapping data via <c>SdlControllerDbParser</c>.  
-	/// It prepares the internal input state tracking for all supported devices.
-	/// </remarks>
 	public InputMap()
 	{
 		SFJoystick.Update();
@@ -124,15 +119,19 @@ public class InputMap
 	/// <c>true</c> if at least one keyboard key is currently pressed; otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="KeyboardButton"/> enumeration
 	/// and checks for the pressed state of each key. It returns <c>true</c> on the first
 	/// key found in the pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting continuous keyboard input or when the user
 	/// is holding down any key, such as for input-sensitive UI effects or idle detection.
+	/// </para>
 	/// </remarks>
 	public bool AnyKeyboardButtonPressed()
 	{
@@ -157,15 +156,19 @@ public class InputMap
 	/// <c>true</c> if at least one keyboard key was pressed in the current frame; otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="KeyboardButton"/> enumeration
 	/// and checks for the just-pressed state of each key. It returns <c>true</c> on the first
 	/// key found in the just-pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting the initial moment of any keyboard interaction,
 	/// such as waking up from a paused state or capturing initial keyboard focus.
+	/// </para>
 	/// </remarks>
 	public bool AnyKeyboardButtonJustPressed()
 	{
@@ -189,8 +192,8 @@ public class InputMap
 	/// <param name="button">The keyboard key to check.</param>
 	/// <returns><c>true</c> if the key is pressed; otherwise, <c>false</c>.</returns>
 	/// <remarks>
-	/// Will return <c>false</c> if the game window is not focused.  
-	/// If a key is pressed, the active input mode is switched to <see cref="ActiveInput.Keyboard"/>.
+	/// Will return <c>false</c> if the game window is not focused. If a key is pressed, 
+	/// the active input mode is switched to <see cref="ActiveInput.Keyboard"/>.
 	/// </remarks>
 	public bool IsKeyPressed(KeyboardButton button)
 	{
@@ -256,15 +259,19 @@ public class InputMap
 	/// <c>true</c> if at least one mouse button is currently pressed; otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="MouseButton"/> enumeration
 	/// and checks for the pressed state of each button. It returns <c>true</c> on the first
 	/// button found in the pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting continuous mouse input, such as during drag operations
 	/// or when checking for any mouse interaction.
+	/// </para>
 	/// </remarks>
 	public bool AnyMouseButtonPressed()
 	{
@@ -289,15 +296,19 @@ public class InputMap
 	/// <c>true</c> if at least one mouse button was pressed in the current frame; otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="MouseButton"/> enumeration
 	/// and checks for the just-pressed state of each button. It returns <c>true</c> on the first
 	/// button found in the just-pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting the initial click of any mouse button,
 	/// such as for focus capture or initial interaction detection.
+	/// </para>
 	/// </remarks>
 	public bool AnyMouseButtonJustPressed()
 	{
@@ -381,15 +392,19 @@ public class InputMap
 	/// otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="GamepadButton"/> enumeration
 	/// and checks for the pressed state of each button across all connected gamepads.
 	/// It returns <c>true</c> on the first button found in the pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting continuous gamepad input from any connected controller,
 	/// such as for idle detection or input-sensitive effects that respond to any controller activity.
+	/// </para>
 	/// </remarks>
 	public bool AnyGamepadButtonPressed()
 	{
@@ -416,15 +431,19 @@ public class InputMap
 	/// otherwise, <c>false</c>.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// This method iterates through all values of the <see cref="GamepadButton"/> enumeration
 	/// and checks for the just-pressed state of each button across all connected gamepads.
 	/// It returns <c>true</c> on the first button found in the just-pressed state.
-	/// 
+	/// </para>
+	/// <para>
 	/// The check is skipped entirely if the game window is not currently active
 	/// (<see cref="Game.IsActive"/> is <c>false</c>).
-	/// 
+	/// </para>
+	/// <para>
 	/// This method is useful for detecting the initial moment of any gamepad interaction,
 	/// such as waking the game from a paused state or capturing initial controller focus.
+	/// </para>
 	/// </remarks>
 	public bool AnyGamepadButtonJustPressed()
 	{
@@ -820,9 +839,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">An enum value representing the action name.</param>
 	/// <returns><c>true</c> if any input bound to the action is currently pressed; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// This overload converts the enum to a string internally using <c>ToEnumString()</c> and passes it to the string-based version.
-	/// </remarks>
 	public bool IsActionPressed(Enum name) => IsActionPressed(name.ToEnumString());
 
 	/// <summary>
@@ -830,10 +846,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">The name of the input action (case-sensitive).</param>
 	/// <returns><c>true</c> if any associated keyboard, mouse, or gamepad binding is currently pressed; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// The input action is looked up by name (hashed internally), and all bound input states are checked.  
-	/// Returns <c>true</c> if any of the associated inputs are actively pressed at the time of the call.
-	/// </remarks>
 	public bool IsActionPressed(string name)
 	{
 		var hash = HashHelpers.Cache32(name);
@@ -879,9 +891,6 @@ public class InputMap
 	/// When this method returns, contains the analog force value of the action, if active; otherwise, <c>0</c>.
 	/// </param>
 	/// <returns><c>true</c> if the action is currently active with a force greater than zero; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// This overload converts the enum to a string using <c>ToEnumString()</c> before lookup.
-	/// </remarks>
 	public bool TryGetActionForce(Enum name, out float output) =>
 		TryGetActionForce(name.ToEnumString(), out output);
 
@@ -911,9 +920,6 @@ public class InputMap
 	/// <c>1.0</c> for digital inputs if pressed, or the analog magnitude for gamepad axes (e.g., triggers, sticks);
 	/// otherwise, <c>0.0</c>.
 	/// </returns>
-	/// <remarks>
-	/// This overload converts the enum to a string using <c>ToEnumString()</c> before resolving the action.
-	/// </remarks>
 	public float GetActionForce(Enum name) => GetActionForce(name.ToEnumString());
 
 	/// <summary>
@@ -971,10 +977,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">The enum representing the input action.</param>
 	/// <returns><c>true</c> if the action was just pressed; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// This checks for a rising edge—meaning the input was not active in the previous frame but is active now.
-	/// Internally calls <see cref="IsActionJustPressed(string)"/> by converting the enum to a string.
-	/// </remarks>
 	public bool IsActionJustPressed(Enum name) => IsActionJustPressed(name.ToEnumString());
 
 	/// <summary>
@@ -982,10 +984,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">The name of the input action.</param>
 	/// <returns><c>true</c> if the action was just pressed; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// This performs a per-device check (keyboard, mouse, or gamepad) for a "just pressed" input,
-	/// meaning it transitioned from unpressed to pressed in the current frame.
-	/// </remarks>
 	public bool IsActionJustPressed(string name)
 	{
 		var hash = HashHelpers.Cache32(name);
@@ -1029,9 +1027,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">The enum representing the input action.</param>
 	/// <returns><c>true</c> if the action is released; otherwise, <c>false</c>.</returns>
-	/// <remarks>
-	/// This is a convenience wrapper that calls <see cref="IsActionReleased(string)"/> using the enum's name.
-	/// </remarks>
 	public bool IsActionReleased(Enum name) => IsActionReleased(name.ToEnumString());
 
 	/// <summary>
@@ -1085,9 +1080,6 @@ public class InputMap
 	/// </summary>
 	/// <param name="name">The enum representing the action name.</param>
 	/// <param name="inputs">One or more input bindings (e.g., <see cref="KeyboardButton"/>, <see cref="MouseButton"/>, or <see cref="GamepadButton"/>).</param>
-	/// <remarks>
-	/// This is a convenience method that converts the enum to a string and calls <see cref="AddAction(string, object[])"/>.
-	/// </remarks>
 	public void AddAction(Enum name, params object[] inputs) => AddAction(name.ToEnumString(), inputs);
 
 	/// <summary>

@@ -199,26 +199,33 @@ public sealed class EngineSettings
 	}
 	internal bool Mouse { get; private set; }
 
+
 	/// <summary>
-	/// Sets whether debug drawing should be enabled.
+	/// Sets the debug draw mode, which determines which layers display debug entity shapes.
 	/// </summary>
-	/// <param name="value">
-	/// A boolean value specifying whether debug drawing is enabled.
+	/// <param name="mode">
+	/// A <see cref="DebugDrawMode"/> value specifying the rendering behavior:
+	/// <list type="bullet">
+	/// <item><description><see cref="DebugDrawMode.All"/> - Renders debug shapes on all layers.</description></item>
+	/// <item><description><see cref="DebugDrawMode.TopMost"/> - Renders debug shapes only on the topmost layer, above everything else.</description></item>
+	/// <item><description><see cref="DebugDrawMode.BottomMost"/> - Renders debug shapes only on the bottommost layer, behind everything else.</description></item>
+	/// <item><description><see cref="DebugDrawMode.None"/> - Disables debug shape rendering entirely.</description></item>
+	/// </list>
 	/// </param>
 	/// <returns>
-	/// The current <see cref="EngineSettings"/> instance for fluent configuration.
+	/// The current <see cref="EngineSettings"/> instance, allowing for fluent method chaining.
 	/// </returns>
-	/// <remarks>
-	/// Enabling this option allows the engine to display visual debugging aids
-	/// during runtime. Disable it for normal gameplay rendering without overlays.
-	/// </remarks>
-	public EngineSettings WithDebugDraw(bool value)
+	public EngineSettings WithDebugDraw(DebugDrawMode mode)
 	{
-		DebugDraw = value;
+		DebugDraw = mode;
 
 		return this;
 	}
-	internal bool DebugDraw { get; private set; }
+	internal DebugDrawMode DebugDraw { get; private set; }
+
+
+
+
 
 	/// <summary>
 	/// Sets the company name associated with the application.
@@ -681,44 +688,77 @@ public sealed class EngineSettings
 	/// <returns>
 	/// The current <see cref="EngineSettings"/> instance for fluent configuration.
 	/// </returns>
+	/// <exception cref="ArgumentException">
+	/// Thrown when the provided color is not fully opaque (Alpha ≠ 255).
+	/// </exception>
 	/// <remarks>
-	/// Throws an <see cref="ArgumentException"/> if the provided color is not fully
-	/// opaque (Alpha ≠ 255). The clear color is applied when the rendering surface
-	/// is reset at the start of each frame.
+	/// The clear color is applied when the rendering surface is cleared at the start of each frame.
+	/// Alpha values are ignored as the clear color is always fully opaque.
 	/// </remarks>
 	public EngineSettings WithClearColor(Color color)
-	{
-		if (color.A != 255)
-			throw new ArgumentException("Clear color must be fully opaque (Alpha = 255).", nameof(color));
+		=> WithClearColor(color.R, color.G, color.B);
 
-		ClearColor = color;
+	/// <summary>
+	/// Sets the clear color used by the engine using individual RGB components.
+	/// </summary>
+	/// <param name="r">
+	/// The red component of the clear color, ranging from 0 to 255.
+	/// </param>
+	/// <param name="g">
+	/// The green component of the clear color, ranging from 0 to 255.
+	/// </param>
+	/// <param name="b">
+	/// The blue component of the clear color, ranging from 0 to 255.
+	/// </param>
+	/// <returns>
+	/// The current <see cref="EngineSettings"/> instance for fluent configuration.
+	/// </returns>
+	/// <remarks>
+	/// This overload constructs a fully opaque <see cref="Color"/> from the specified RGB values.
+	/// The clear color is applied when the rendering surface is cleared at the start of each frame.
+	/// </remarks>
+	public EngineSettings WithClearColor(byte r, byte g, byte b)
+	{
+		ClearColor = new Color(r, g, b);
 
 		return this;
 	}
 	internal Color ClearColor { get; private set; }
 
 	/// <summary>
-	/// Sets the collection of screens configured for the application.
+	/// Sets the collection of screen types configured for the application.
 	/// </summary>
-	/// <param name="values">
-	/// One or more <see cref="Screen"/> instances to be used by the engine.
+	/// <param name="screens">
+	/// One or more <see cref="Type"/> instances representing screens to be used by the engine.
+	/// Each type must be <see cref="Screen"/> or derive from it.
 	/// </param>
 	/// <returns>
 	/// The current <see cref="EngineSettings"/> instance for fluent configuration.
 	/// </returns>
+	/// <exception cref="ArgumentNullException">
+	/// Thrown when <paramref name="screens"/> is <see langword="null"/>.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Thrown when <paramref name="screens"/> is empty.
+	/// </exception>
+	/// <exception cref="InvalidOperationException">
+	/// Thrown when any type in <paramref name="screens"/> is not <see cref="Screen"/>
+	/// or does not derive from <see cref="Screen"/>.
+	/// </exception>
 	/// <remarks>
-	/// Throws an <see cref="ArgumentNullException"/> if the provided array is null,
-	/// or an <see cref="ArgumentException"/> if no screens are specified. This ensures
-	/// that the engine always has at least one valid screen to render to.
+	/// This method ensures the engine has at least one valid screen type to instantiate
+	/// and render during the application lifecycle.
 	/// </remarks>
-	public EngineSettings WithScreens(params Type[] values)
+	public EngineSettings WithScreens(params Type[] screens)
 	{
-		if (values == null)
-			throw new ArgumentNullException(nameof(values), "Values cannot be null.");
-		if (values.Length == 0)
+		if (screens == null)
+			throw new ArgumentNullException(nameof(screens), "cannot be null.");
+		if (screens.Length == 0)
 			throw new ArgumentException("At least one screen must be provided");
+		if (!screens.All(x => x.IsSubclassOf(typeof(Screen)) || x == typeof(Screen)))
+			throw new InvalidOperationException("All types must be Screen or dervice from Screen");
 
-		Screens = values;
+		Screens = screens;
 
 		return this;
 	}
@@ -808,10 +848,18 @@ public sealed class EngineSettings
 	}
 	internal int LogMaxRecentEntries { get; private set; }
 
-	/// <summary>Sets the number of minutes an asset can remain unused before being eligible for eviction.</summary>
-	/// <param name="minutes">The eviction timeout in minutes. Must be greater than zero.</param>
-	/// <returns>This <see cref="EngineSettings"/> instance for method chaining.</returns>
-	/// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="minutes"/> is zero.</exception>
+	/// <summary>
+	/// Sets the number of minutes an asset can remain unused before being eligible for eviction.
+	/// </summary>
+	/// <param name="minutes">
+	/// The eviction timeout in minutes. Must be greater than zero.
+	/// </param>
+	/// <returns>
+	/// The current <see cref="EngineSettings"/> instance for method chaining.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown when <paramref name="minutes"/> is zero.
+	/// </exception>
 	public EngineSettings WithAssetEvictionMinutes(uint minutes)
 	{
 		if (minutes == 0)
@@ -889,11 +937,21 @@ public sealed class EngineSettings
 
 
 
-	/// <summary>Sets the culling range used for viewport-based object culling.</summary>
-	/// <param name="width">The culling width. Must be greater than zero.</param>
-	/// <param name="height">The culling height. Must be greater than zero.</param>
-	/// <returns>This <see cref="EngineSettings"/> instance for method chaining.</returns>
-	/// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="width"/> or <paramref name="height"/> is zero.</exception>
+	/// <summary>
+	/// Sets the culling range used for viewport-based object culling.
+	/// </summary>
+	/// <param name="width">
+	/// The culling width. Must be greater than zero.
+	/// </param>
+	/// <param name="height">
+	/// The culling height. Must be greater than zero.
+	/// </param>
+	/// <returns>
+	/// The current <see cref="EngineSettings"/> instance for method chaining.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Thrown when <paramref name="width"/> or <paramref name="height"/> is zero.
+	/// </exception>
 	public EngineSettings WithCullRange(uint width, uint height)
 	{
 		if (width == 0)
@@ -1003,7 +1061,7 @@ public sealed class EngineSettings
 		InputMap ??= new DefaultInputMap();
 
 		// Atlas & cache defaults
-		MaxAtlasPages = MaxAtlasPages > 0 ? MaxAtlasPages : 6;
+		MaxAtlasPages = MaxAtlasPages > 0 ? MaxAtlasPages : 3;
 		AtlasPageSize = AtlasPageSize > 0 ? AtlasPageSize : 512;
 		DrawCallCache = DrawCallCache > 0 ? DrawCallCache : 512;
 		DeadZone = DeadZone > 0 ? DeadZone : 0.2f;

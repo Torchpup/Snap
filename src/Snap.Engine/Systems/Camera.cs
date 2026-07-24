@@ -14,7 +14,7 @@ public class Camera
 	private float _shakeDuration;         // total seconds of shake
 	private float _shakeTimeRemaining;    // seconds left to shake
 	private float _shakeMagnitude;        // initial magnitude (in world‐units)
-	// private Vect2 _orginalOffset;
+										  // private Vect2 _orginalOffset;
 	private bool _isFlying;
 	private Vect2 _flyStart;
 	private Vect2 _flyTarget;
@@ -31,9 +31,6 @@ public class Camera
 	/// <summary>
 	/// Gets or sets the camera's position in world coordinates.
 	/// </summary>
-	/// <remarks>
-	/// Setting this value updates the view and culling bounds.
-	/// </remarks>
 	public Vect2 Position
 	{
 		get => _position;
@@ -45,7 +42,7 @@ public class Camera
 
 			CullBounds = Rect2.FromCenter(_position, _viewport + EngineSettings.Instance.CullRange);
 			_view.Center = _position;
-			_screen.SetDirtyState(DirtyState.Update);
+			_screen.SetDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 
@@ -60,10 +57,6 @@ public class Camera
 	/// </summary>
 	public Rect2 Clamp { get; set; }
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Camera"/> class.
-	/// </summary>
-	/// <param name="screen">The screen associated with this camera.</param>
 	internal Camera(Screen screen)
 	{
 		_isFlying = false;
@@ -84,7 +77,7 @@ public class Camera
 		Position = _viewport / 2f;     // e.g. (160, 90)
 									   // (Position setter will set CullBounds and _view.Center)
 
-		// Don't remove or change. This makes it so stacking
+		// WARNING: Don't remove or change. This makes it so stacking
 		// LDTK tiles appear properly. Don't touch or mess with.
 		_lastDirtyPosition = Position;
 	}
@@ -157,7 +150,7 @@ public class Camera
 			Position = entity.Position;
 
 		_followTarget = entity;
-		_screen.SetDirtyState(DirtyState.Update);
+		_screen.SetDirtyState(DirtyState.AddOrRemove);
 	}
 
 	/// <summary>
@@ -183,6 +176,54 @@ public class Camera
 		_shakeMagnitude = magnitude;
 		// _orginalOffset = Position;
 	}
+
+
+
+
+	/// <summary>
+	/// Converts a world-space position to screen-space coordinates.
+	/// </summary>
+	/// <param name="worldPos">The position in world space.</param>
+	/// <returns>The equivalent position in screen space.</returns>
+	public Vect2 WorldToScreen(Vect2 worldPos)
+	{
+		return worldPos - Position + _viewCenter;
+	}
+
+	/// <summary>
+	/// Converts a screen-space position to world-space coordinates.
+	/// </summary>
+	/// <param name="screenPos">The position in screen space.</param>
+	/// <returns>The equivalent position in world space.</returns>
+	public Vect2 ScreenToWorld(Vect2 screenPos)
+	{
+		return screenPos + Position + _viewCenter;
+	}
+
+	/// <summary>
+	/// Converts a world-space rectangle to screen-space coordinates.
+	/// </summary>
+	/// <param name="worldRect">The rectangle in world space.</param>
+	/// <returns>The equivalent rectangle in screen space.</returns>
+	public Rect2 WorldToScreen(Rect2 worldRect)
+	{
+		var pos = WorldToScreen(worldRect.Position);
+		return new Rect2(pos, worldRect.Size);
+	}
+
+	/// <summary>
+	/// Converts a screen-space rectangle to world-space coordinates.
+	/// </summary>
+	/// <param name="screenRect">The rectangle in screen space.</param>
+	/// <returns>The equivalent rectangle in world space.</returns>
+	public Rect2 ScreenToWorld(Rect2 screenRect)
+	{
+		var pos = ScreenToWorld(screenRect.Position);
+		return new Rect2(pos, screenRect.Size);
+	}
+
+
+
 
 	internal void Update(float dt)
 	{
@@ -237,7 +278,7 @@ public class Camera
 		const float pixelThreshold = 1.0f;
 		if ((desired - _lastDirtyPosition).Length() >= pixelThreshold)
 		{
-			_screen.SetDirtyState(DirtyState.Update);
+			_screen.SetDirtyState(DirtyState.AddOrRemove);
 		}
 	}
 

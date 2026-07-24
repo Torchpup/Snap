@@ -42,7 +42,7 @@ public class StackPanel : Panel
 			if (_hAlign == value)
 				return;
 			_hAlign = value;
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class StackPanel : Panel
 			if (_vAlign == value)
 				return;
 			_vAlign = value;
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class StackPanel : Panel
 		{
 			if (_spacing == value) return;
 			_spacing = value;
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class StackPanel : Panel
 		if (AutoSize)
 		{
 			LocalSize = OnResize(Children);
-			SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 		}
 
 		if (Direction == StackDirection.Vertical)
@@ -136,7 +136,7 @@ public class StackPanel : Panel
 			HPanelStack(children);
 
 		if (IsTopmostScreen || Parent == null)
-			Screen?.SetDirtyState(DirtyState.Sort | DirtyState.Update);
+			Screen?.SetDirtyState(DirtyState.Sort | DirtyState.AddOrRemove);
 
 		base.OnDirty(state);
 	}

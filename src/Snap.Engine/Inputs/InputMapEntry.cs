@@ -19,17 +19,11 @@ public class InputMapEntry
 	/// <exception cref="InvalidCastException">
 	/// Thrown if the stored value is not compatible with <typeparamref name="T"/>.
 	/// </exception>
-	/// <remarks>
-	/// This is commonly used to recover the original input action enum (e.g., <see cref="DefaultInputs"/>).
-	/// </remarks>
 	public T ValueAs<T>() where T : Enum => (T)_value;
 
 	/// <summary>
 	/// Initializes a new <see cref="InputMapEntry"/> with the specified action identifier.
 	/// </summary>
 	/// <param name="value">The enum value representing the input action associated with this entry.</param>
-	/// <remarks>
-	/// This value is stored as an <see cref="object"/> but expected to be an <see cref="Enum"/> at runtime.
-	/// </remarks>
 	internal InputMapEntry(object value) => _value = value;
 }
