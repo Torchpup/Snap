@@ -133,8 +133,6 @@ public sealed class TextureAtlasManager
 			return info.Handle;
 		}
 
-		// AtlasHandle handle;
-
 		// Try packing straight away (no eviction)
 		if (TryPackIntoAnyPage(srcTexture, srcRect, out var handle))
 		{

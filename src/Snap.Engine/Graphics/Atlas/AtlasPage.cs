@@ -66,25 +66,18 @@ public sealed class AtlasPage
 		var region = new SFImage(new SFVectU((uint)srcRect.Width, (uint)srcRect.Height));
 		region.Copy(
 			img,
-			// 0, 0,
 			new(0, 0),
-
-			// new SFRectI(
-			// 	(int)srcRect.Left, (int)srcRect.Top,
-			// 	(int)srcRect.Width, (int)srcRect.Height
-			// ),
 			new SFRectI(
 				new(srcRect.Left, srcRect.Top),
 				new(srcRect.Width, srcRect.Height)
 			),
 			false
 		);
-		// Texture.Update(region, (uint)dst.Left, (uint)dst.Top);
+
 		Texture.Update(region, new((uint)dst.Left, (uint)dst.Top));
-
 		UsedPixels += (long)srcRect.Width * srcRect.Height;
-
 		handle = new AtlasHandle(PageIndex, dst);
+		
 		return true;
 	}
 

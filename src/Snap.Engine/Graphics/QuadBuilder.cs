@@ -55,7 +55,6 @@ internal static class QuadBuilder
 			);
 		}
 
-		// UV coordinates (your existing UV code remains the same)
 		float u1 = srcRect.Left;
 		float v1 = srcRect.Top;
 		float u2 = srcRect.Right;

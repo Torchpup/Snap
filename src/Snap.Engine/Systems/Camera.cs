@@ -186,9 +186,7 @@ public class Camera
 	/// <param name="worldPos">The position in world space.</param>
 	/// <returns>The equivalent position in screen space.</returns>
 	public Vect2 WorldToScreen(Vect2 worldPos)
-	{
-		return worldPos - Position + _viewCenter;
-	}
+		=> worldPos - Position + _viewCenter;
 
 	/// <summary>
 	/// Converts a screen-space position to world-space coordinates.
@@ -196,9 +194,7 @@ public class Camera
 	/// <param name="screenPos">The position in screen space.</param>
 	/// <returns>The equivalent position in world space.</returns>
 	public Vect2 ScreenToWorld(Vect2 screenPos)
-	{
-		return screenPos + Position + _viewCenter;
-	}
+		=> screenPos + Position + _viewCenter;
 
 	/// <summary>
 	/// Converts a world-space rectangle to screen-space coordinates.

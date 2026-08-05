@@ -86,7 +86,7 @@ public sealed class Logger : TextWriter, IDisposable
 	/// <exception cref="InvalidOperationException">
 	/// Thrown if a <see cref="Logger"/> instance has already been initialized.
 	/// </exception>
-	public Logger(LogLevel minLevel = LogLevel.Info, int maxRecentEntries = 100)
+	internal Logger(LogLevel minLevel = LogLevel.Info, int maxRecentEntries = 100)
 	{
 		if (Instance != null)
 			throw new InvalidOperationException("Logger already initialized.");

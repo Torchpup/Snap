@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NoWarn>NETSDK1206;IDE0046;CA1822;</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
     <PackageId>SnapEngine</PackageId>
     <Version>1.0.6</Version>
     <Authors>Shmellyorc</Authors>

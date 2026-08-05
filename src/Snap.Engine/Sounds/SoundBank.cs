@@ -76,7 +76,6 @@ public sealed class SoundBank
 	public int Count => _instances
 		.SelectMany(x => x.Value)
 		.Count(x => x.Instance.IsPlaying);
-	// .Count(x => x.Instance.IsValid);
 
 	/// <summary>
 	/// Gets the unique identifier assigned to this sound manager or entity.

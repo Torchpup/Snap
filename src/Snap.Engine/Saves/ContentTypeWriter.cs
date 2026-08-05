@@ -52,7 +52,7 @@ public sealed class ContentTypeWriter : BinaryWriter
 	/// This method does not preserve the enum's original underlying type.
 	/// All enums are serialized as Int32 values for consistency.
 	/// </remarks>
-	public void Write(Enum value) => Write(Convert.ToInt32(value));
+	public void Write(Enum value) => Write(Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
 
 	/// <summary>
@@ -62,6 +62,9 @@ public sealed class ContentTypeWriter : BinaryWriter
 	/// <param name="value">The object to write.</param>
 	public void WriteObject<T>(T value)
 	{
+		if (value == null)
+			throw new ArgumentNullException(nameof(value));
+
 		using var ms = new MemoryStream();
 		var serializer = new XmlSerializer(typeof(T));
 		serializer.Serialize(ms, value);

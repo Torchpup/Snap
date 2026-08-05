@@ -67,14 +67,6 @@ public sealed class LDtkMap : IAsset
 			return;
 		}
 
-		// byte[] bytes;
-		// using (var s = AssetManager.OpenStream(Tag))
-		// using (var ms = new MemoryStream())
-		// {
-		// 	s.CopyTo(ms);
-		// 	bytes = ms.ToArray();
-		// }
-
 		var doc = JsonDocument.Parse(Data);
 		var root = doc.RootElement;
 

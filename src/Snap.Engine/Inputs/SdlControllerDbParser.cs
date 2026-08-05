@@ -24,16 +24,34 @@ internal static class SdlControllerDbParser
 		return list;
 	}
 
-	private static Dictionary<char, int> ParseMap(string mapping)
+	private static Dictionary<string, SdlBinding> ParseMap(string mapping)
 	{
-		var dict = new Dictionary<char, int>();
+		var dict = new Dictionary<string, SdlBinding>();
 
 		foreach (var token in mapping.Split(','))
 		{
 			var kv = token.Split(':', 2);
 			if (kv.Length != 2) continue;
-			if (int.TryParse(kv[1], out var idx))
-				dict[kv[0][0]] = idx;
+
+			string key = kv[0];
+			string val = kv[1];
+
+			if (val.StartsWith('b') && int.TryParse(val.AsSpan(1), out var btnIdx))
+			{
+				dict[key] = new SdlBinding(SdlBindingType.Button, btnIdx);
+			}
+			else if (val.StartsWith('a') && int.TryParse(val.AsSpan(1), out var axisIdx))
+			{
+				dict[key] = new SdlBinding(SdlBindingType.Axis, axisIdx);
+			}
+			else if (val.StartsWith('h'))
+			{
+				var parts = val[1..].Split('.');
+				if (parts.Length == 2 && int.TryParse(parts[0], out var hatIdx) && int.TryParse(parts[1], out var hatMask))
+				{
+					dict[key] = new SdlBinding(SdlBindingType.Hat, hatIdx, hatMask);
+				}
+			}
 		}
 
 		return dict;

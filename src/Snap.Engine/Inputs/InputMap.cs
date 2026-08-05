@@ -30,7 +30,7 @@ public class InputMap
 	private readonly uint _joyCount;
 	private readonly Dictionary<uint, bool> _joysticks = [];
 	private readonly List<SdlControllerEntry> _allEntries = [];
-	private readonly Dictionary<uint, Dictionary<char, int>> _controllerMaps = [];
+	private readonly Dictionary<uint, Dictionary<string, SdlBinding>> _controllerMaps = [];
 
 	internal readonly Dictionary<uint, List<InputMapEntry>> Actions = new(20);
 
@@ -537,23 +537,18 @@ public class InputMap
 
 			if (TryGetSdlIndex(joyId, button, out var idx))
 			{
-				// if idx refers to an axis, call GetAxis; otherwise treat as button
-				if (IsAxisButton(button))
+				float force = idx.Type switch
 				{
-					float f = GetAxis(joyId, (SFJoystickAxis)idx);
-					if (f != 0f)
-					{
-						Current = ActiveInput.Gamepad;
-						return MathF.Abs(f);
-					}
-				}
-				else
+					SdlBindingType.Button => SFJoystick.IsButtonPressed(joyId, (uint)idx.Index) ? 1f : 0f,
+					SdlBindingType.Axis => MathF.Abs(GetAxis(joyId, (SFJoystickAxis)idx.Index)),
+					SdlBindingType.Hat => CheckHatState(joyId, idx.Index, idx.HatMask) ? 1f : 0f,
+					_ => 0f
+				};
+
+				if (force > 0f)
 				{
-					if (SFJoystick.IsButtonPressed(joyId, (uint)idx))
-					{
-						Current = ActiveInput.Gamepad;
-						return 1f;
-					}
+					Current = ActiveInput.Gamepad;
+					return force;
 				}
 			}
 			else
@@ -631,7 +626,15 @@ public class InputMap
 			// try SDL mapping first
 			if (TryGetSdlIndex(joyId, button, out var idx))
 			{
-				if (SFJoystick.IsButtonPressed(joyId, (uint)idx))
+				bool pressed = idx.Type switch
+				{
+					SdlBindingType.Button => SFJoystick.IsButtonPressed(joyId, (uint)idx.Index),
+					SdlBindingType.Axis => MathF.Abs(GetAxis(joyId, (SFJoystickAxis)idx.Index)) > DeadZone,
+					SdlBindingType.Hat => CheckHatState(joyId, idx.Index, idx.HatMask),
+					_ => false
+				};
+
+				if (pressed)
 				{
 					Current = ActiveInput.Gamepad;
 					return true;
@@ -815,7 +818,7 @@ public class InputMap
 
 		if (entry != null)
 		{
-			_controllerMaps[joyId] = entry.ButtonMap;
+			_controllerMaps[joyId] = entry.Map;
 
 			Logger.Instance.Log(LogLevel.Info,
 				$"[InputMap] Loaded mapping for “{entry.Name}” " +
@@ -1104,69 +1107,48 @@ public class InputMap
 
 
 	#region Private Methods
-	private bool IsAxisButton(GamepadButton button)
+	private bool CheckHatState(uint joyId, int hatIndex, int hatMask)
 	{
-		return button switch
+		return hatMask switch
 		{
-			GamepadButton.DPadUp
-				or GamepadButton.DPadDown
-				or GamepadButton.DPadLeft
-				or GamepadButton.DPadRight
-				or GamepadButton.LeftStickLeft
-				or GamepadButton.LeftStickRight
-				or GamepadButton.LeftStickUp
-				or GamepadButton.LeftStickDown
-				or GamepadButton.RightStickLeft
-				or GamepadButton.RightStickRight
-				or GamepadButton.RightStickUp
-				or GamepadButton.RightStickDown
-				or GamepadButton.LeftTrigger
-				or GamepadButton.RightTrigger
-
-			=> true,
-
+			1 => GetPovY(joyId) > DeadZone,   // Up
+			2 => GetPovX(joyId) > DeadZone,   // Right
+			4 => GetPovY(joyId) < -DeadZone,  // Down
+			8 => GetPovX(joyId) < -DeadZone,  // Left
 			_ => false
 		};
 	}
 
-	private bool TryGetSdlIndex(uint joyId, GamepadButton button, out int sdlIndex)
+	private bool TryGetSdlIndex(uint joyId, GamepadButton button, out SdlBinding binding)
 	{
-		sdlIndex = -1;
+		binding = default;
 
 		if (!_controllerMaps.TryGetValue(joyId, out var map))
 			return false;
 
-		char key = button switch
+		string key = button switch
 		{
-			GamepadButton.AButton => 'a',
-			GamepadButton.BButton => 'b',
-			GamepadButton.XButton => 'x',
-			GamepadButton.YButton => 'y',
-
-			GamepadButton.LeftBumper => 'l',
-			GamepadButton.RightBumper => 'r',
-			GamepadButton.Back => 'b',   // may collide with BButton if your parser used 'b'
-			GamepadButton.Start => 's',
-			GamepadButton.LeftStick => 'L',
-			GamepadButton.RightStick => 'R',
-
-			GamepadButton.DPadUp => 'u',
-			GamepadButton.DPadDown => 'd',
-			GamepadButton.DPadLeft => 'l',
-			GamepadButton.DPadRight => 'r',
-
-			GamepadButton.LeftTrigger => 't',
-			GamepadButton.RightTrigger => 'T',
-
-			_ => '\0'
+			GamepadButton.AButton => "a",
+			GamepadButton.BButton => "b",
+			GamepadButton.XButton => "x",
+			GamepadButton.YButton => "y",
+			GamepadButton.LeftBumper => "leftshoulder",
+			GamepadButton.RightBumper => "rightshoulder",
+			GamepadButton.Back => "back",
+			GamepadButton.Start => "start",
+			GamepadButton.LeftStick => "leftstick",
+			GamepadButton.RightStick => "rightstick",
+			GamepadButton.DPadUp => "dpup",
+			GamepadButton.DPadDown => "dpdown",
+			GamepadButton.DPadLeft => "dpleft",
+			GamepadButton.DPadRight => "dpright",
+			GamepadButton.LeftTrigger => "lefttrigger",
+			GamepadButton.RightTrigger => "righttrigger",
+			_ => null
 		};
 
-		// If we got a valid key and the map contains it, return the index
-		if (key != '\0' && map.TryGetValue(key, out var idx))
-		{
-			sdlIndex = idx;
+		if (key != null && map.TryGetValue(key, out binding))
 			return true;
-		}
 
 		return false;
 	}

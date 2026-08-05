@@ -38,8 +38,6 @@ public sealed class SpriteFont : Font
 	/// <summary>All punctuation and symbol characters (non-alphanumeric).</summary>
 	public const string CharListPunctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-
-
 	/// <summary>
 	/// Gets the adjusted line height used for rendering multiline text.
 	/// </summary>
@@ -95,14 +93,6 @@ public sealed class SpriteFont : Font
 			return;
 		}
 
-		// byte[] bytes;
-		// using (var stream = AssetManager.OpenStream(Tag))
-		// using (var ms = new MemoryStream())
-		// {
-		// 	stream.CopyTo(ms);
-		// 	bytes = ms.ToArray();
-		// }
-
 		var seq = _charList.IsEmpty()
 			? " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOP" +
 				"QRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
@@ -117,9 +107,6 @@ public sealed class SpriteFont : Font
 
 		IsValid = true;
 		LastAccessTime = DateTime.Now;
-		// Length = Texture.Size.X * (ulong)Texture.Size.Y * 4UL;
-
-		// return Length;
 	}
 
 	/// <summary>
@@ -138,17 +125,8 @@ public sealed class SpriteFont : Font
 
 	private Dictionary<char, Glyph> LoadBorderCells(SFImage image, string asciiSequence, float spacing = 0f)
 	{
-		// using var s = AssetManager.OpenStream(imagePath);
-		// using var ms = new MemoryStream();
-		// s.CopyTo(ms);
-		// using var img = new SFImage(ms.ToArray());
-		// var img = new SFImage(Data);
-
 		uint w = image.Size.X, h = image.Size.Y;
-
-		// SFColor topLeft = img.GetPixel(0, 0);
 		SFColor topLeft = image.GetPixel(new(0, 0));
-
 		bool isFullyTransparent = topLeft.A == 0;
 
 		if (isFullyTransparent)
@@ -165,7 +143,6 @@ public sealed class SpriteFont : Font
 
 		bool IsMagenta(uint x, uint y)
 		{
-			// var px = img.GetPixel(x, y);
 			var px = image.GetPixel(new(x, y));
 			return px.R == topLeft.R && px.G == topLeft.G && px.B == topLeft.B;// && px.A == topLeft.A;
 		}
@@ -207,7 +184,6 @@ public sealed class SpriteFont : Font
 					}
 				}
 
-				// componetRects.Add(new SFRectI((int)minX, (int)minY, (int)(maxX - minX + 1), (int)(maxY - minY + 1)));
 				componetRects.Add(new SFRectI(new((int)minX, (int)minY), new((int)(maxX - minX + 1), (int)(maxY - minY + 1))));
 			}
 		}
@@ -249,7 +225,6 @@ public sealed class SpriteFont : Font
 				bool columnAllBorder = true;
 				for (int yy = y0; yy <= y1; yy++)
 				{
-					// var px = img.GetPixel((uint)x0, (uint)yy);
 					var px = image.GetPixel(new((uint)x0, (uint)yy));
 					if (!(px.R == borderColor.R && px.G == borderColor.G && px.B == borderColor.B && px.A == borderColor.A))
 					{
@@ -266,7 +241,6 @@ public sealed class SpriteFont : Font
 				bool columnAllBorder = true;
 				for (int yy = y0; yy <= y1; yy++)
 				{
-					// var px = img.GetPixel((uint)x1, (uint)yy);
 					var px = image.GetPixel(new((uint)x1, (uint)yy));
 					if (!(px.R == borderColor.R && px.G == borderColor.G && px.B == borderColor.B && px.A == borderColor.A))
 					{
@@ -283,7 +257,6 @@ public sealed class SpriteFont : Font
 				bool columnAllBorder = true;
 				for (int xx = x0; xx <= x1; xx++)
 				{
-					// var px = img.GetPixel((uint)xx, (uint)y0);
 					var px = image.GetPixel(new((uint)xx, (uint)y0));
 					if (!(px.R == borderColor.R && px.G == borderColor.G && px.B == borderColor.B && px.A == borderColor.A))
 					{
@@ -300,7 +273,6 @@ public sealed class SpriteFont : Font
 				bool columnAllBorder = true;
 				for (int xx = x0; xx <= x1; xx++)
 				{
-					// var px = img.GetPixel((uint)xx, (uint)y1);
 					var px = image.GetPixel(new((uint)xx, (uint)y1));
 					if (!(px.R == borderColor.R && px.G == borderColor.G && px.B == borderColor.B && px.A == borderColor.A))
 					{
@@ -318,7 +290,6 @@ public sealed class SpriteFont : Font
 			if (innerW <= 0 || innerH <= 0)
 				throw new Exception();
 
-			// var innerRect = new SFRectI(x0, y0, innerW, innerH);
 			var innerRect = new SFRectI(new(x0, y0), new(innerW, innerH));
 			int advance = innerW + (int)spacing;
 

@@ -304,6 +304,9 @@ public class Screen
 		OnUpdate();
 	}
 
+
+
+
 	/// <summary>
 	/// Called once per frame while the screen is active, before entities are updated.
 	/// </summary>

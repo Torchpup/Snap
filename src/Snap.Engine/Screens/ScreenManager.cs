@@ -146,7 +146,7 @@ public sealed class ScreenManager
 			_screensById.Add(screen.Id, screen);
 		}
 
-		_dirtyState = DirtyState.AddOrRemove | DirtyState.Sort;
+		_dirtyState |= DirtyState.AddOrRemove | DirtyState.Sort;
 	}
 
 	/// <summary>
@@ -174,7 +174,7 @@ public sealed class ScreenManager
 		}
 
 		if (anyRemoved)
-			_dirtyState = DirtyState.AddOrRemove | DirtyState.Sort;
+			_dirtyState |= DirtyState.AddOrRemove | DirtyState.Sort;
 	}
 
 	/// <summary>
@@ -225,8 +225,8 @@ public sealed class ScreenManager
 
 		Remove([.. _screens]);
 
-		_dirtyState = DirtyState.AddOrRemove;
+		_dirtyState |= DirtyState.AddOrRemove;
 	}
 
-	internal void UpdateDirtyState(DirtyState state) => _dirtyState = state;
+	internal void UpdateDirtyState(DirtyState state) => _dirtyState |= state;
 }

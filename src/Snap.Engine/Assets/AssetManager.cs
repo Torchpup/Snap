@@ -116,6 +116,13 @@ public sealed class AssetManager
     {
         _mounts.Clear();
 
+        // Add platform-specific mount first (highest priority)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // On macOS, bundle mount has highest priority
+            _mounts.Add(new MacOsMount());
+        }
+
         // Always keep VFS mount as fallback
         _mounts.Add(new VirtualFileSystemMount());
     }
